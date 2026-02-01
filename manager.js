@@ -654,7 +654,7 @@ function generateFinalPDF() {
         element.innerHTML = htmlContent;
         // Fix für mobile Geräte: Breite erzwingen, damit das Layout A5 Querformat entspricht
         // und nicht auf die Bildschirmbreite des Handys gequetscht wird.
-        element.style.width = '210mm';
+        // element.style.width = '210mm';
 
         const opt = {
             margin: [5, 5, 5, 5],
@@ -664,8 +664,7 @@ function generateFinalPDF() {
                 scale: 2,
                 logging: false,
                 scrollY: 0,
-                scrollX: 0,
-                windowWidth: 1200
+                scrollX: 0
             },
             jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a5' }
         };
