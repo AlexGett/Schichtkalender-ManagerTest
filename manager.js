@@ -322,6 +322,8 @@ function generateFinalPDF() {
                         padding: 10px;
                         background-color: #fff;
                         position: relative;
+                        -webkit-text-size-adjust: none;
+                        text-size-adjust: none;
                     }
             
                     /* Wrapper für Zentrierung auf dem Blatt */
@@ -662,7 +664,8 @@ function generateFinalPDF() {
                 scale: 2,
                 logging: false,
                 scrollY: 0,
-                scrollX: 0
+                scrollX: 0,
+                windowWidth: 1200
             },
             jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a5' }
         };
