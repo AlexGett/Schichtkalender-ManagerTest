@@ -135,8 +135,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // Service Worker registrieren (für Offline-Funktionalität & Updates)
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./service-worker.js')
-            .then(() => console.log('Service Worker für Manager registriert'))
+            .then(registration => {
+                console.log('Service Worker für Manager registriert');
+
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            const updateBanner = document.getElementById('update-banner');
+                            if (updateBanner) updateBanner.style.display = 'flex';
+                        }
+                    });
+                });
+
+                const reloadButton = document.getElementById('reload-button');
+                if (reloadButton) {
+                    reloadButton.addEventListener('click', () => {
+                        if (registration.waiting) {
+                            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                        }
+                    });
+                }
+            })
             .catch(err => console.error('Service Worker Fehler:', err));
+
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            window.location.reload();
+        });
     }
 });
 
@@ -625,6 +650,9 @@ function generateFinalPDF() {
 
         const element = document.createElement('div');
         element.innerHTML = htmlContent;
+        // Fix für mobile Geräte: Breite erzwingen, damit das Layout A5 Querformat entspricht
+        // und nicht auf die Bildschirmbreite des Handys gequetscht wird.
+        element.style.width = '210mm';
 
         const opt = {
             margin: [5, 5, 5, 5],
