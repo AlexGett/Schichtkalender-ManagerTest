@@ -303,217 +303,217 @@ function generateFinalPDF() {
         const workingDays = data.workingDays !== undefined ? data.workingDays : '';
 
         const htmlContent = `
-                <!DOCTYPE html>
-                <html lang="de">
-                <head>
-                    <meta charset="UTF-8">
-                    <style>
-                        @page {
-                            size: A5 landscape;
-                            margin: 5mm;
-                        }
-                
-                        body {
-                            font-family: Arial, sans-serif;
-                            font-size: 9pt;
-                            color: #000;
-                            line-height: 1.1;
-                            margin: 0;
-                            padding: 10px;
-                            background-color: #fff;
-                            position: relative;
-                        }
-                
-                        /* Wrapper für Zentrierung auf dem Blatt */
-                        .pdf-wrapper {
-                            width: 100%;
-                            height: 130mm;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                        }
+            <!DOCTYPE html>
+            <html lang="de">
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    @page {
+                        size: A5 landscape;
+                        margin: 5mm;
+                    }
+            
+                    body {
+                        font-family: Arial, sans-serif;
+                        font-size: 9pt;
+                        color: #000;
+                        line-height: 1.1;
+                        margin: 0;
+                        padding: 10px;
+                        background-color: #fff;
+                        position: relative;
+                    }
+            
+                    /* Wrapper für Zentrierung auf dem Blatt */
+                    .pdf-wrapper {
+                        width: 100%;
+                        height: 130mm; /* A5 Höhe (148mm) minus Ränder (10mm) minus Puffer */
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
 
-                        .container {
-                            width: 100%;
-                            max-width: 195mm;
-                            margin: 0 auto;
-                        }
-                
-                        /* Header */
-                        .header {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            margin-bottom: 10px;
-                        }
-                
-                        .header h1 {
-                            font-size: 14pt;
-                            margin: 0;
-                        }
-                
-                        .logo {
-                            color: #db261f;
-                            font-weight: 900;
-                            font-size: 120pt;
-                            position: absolute;
-                            top: -38px;
-                            right: 30px;
-                        }
-                
-                        /* Top Info */
-                        .top-fields {
-                            display: flex;
-                            gap: 10px;
-                            margin-bottom: 10px;
-                        }
-                
-                        .field-group {
-                            display: flex;
-                            align-items: flex-end;
-                            border-bottom: 1px solid #000;
-                        }
-                
-                        .field-group label {
-                            font-weight: bold;
-                            margin-right: 3px;
-                            white-space: nowrap;
-                        }
-                
-                        .field-group input {
-                            border: none;
-                            width: 100%;
-                            outline: none;
-                            font-size: 9pt;
-                            background: transparent;
-                        }
-                
-                        /* Table */
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                        }
-                
-                        td {
-                            padding: 3px 0;
-                            vertical-align: middle;
-                        }
-                
-                        .col-num {
-                            width: 15px;
-                            font-weight: bold;
-                            font-size: 9pt;
-                        }
-                
-                        .col-label {
-                            width: 180px;
-                            font-weight: bold;
-                            font-size: 9pt;
-                        }
-                
-                        /* Kleine Schrift für Hilfstexte */
-                        .small-label {
-                            font-size: 9pt;
-                            font-weight: normal;
-                        }
-                
-                        .inline-input {
-                            border: none;
-                            border-bottom: 1px solid #000;
-                            outline: none;
-                            font-size: 8.5pt;
-                            background: transparent;
-                            text-align: center;
-                        }
-                
-                        /* Krank Section */
-                        .krank-container {
-                            margin-top: 10px;
-                            font-size: 8.7pt;
-                        }
-                
-                        .krank-title {
-                            font-weight: bold;
-                            font-size: 8.6pt;
-                        }
-                
-                        /* Bottom Grid */
-                        .bottom-grid {
-                            display: grid;
-                            grid-template-columns: 1fr 320px;
-                            gap: 15px;
-                            margin-top: 10px;
-                        }
-                
-                        .remarks-area div {
-                            margin-bottom: 6px;
-                            display: flex;
-                            font-size: 8pt;
-                            font-weight: bold;
-                            align-items: center;
-                        }
-                
-                        .doctor-box {
-                            border: 1px solid #000;
-                            padding: 5px;
-                            min-height: 55px;
-                            max-width: 270px;
-                            font-size: 6pt;
-                        }
-                
-                        .doctor-stamp {
-                            margin-top: 12px;
-                            border-top: 1px dotted #666;
-                            font-size: 6pt;
-                        }
-                
-                        /* Signatures */
-                        .signature-section {
-                            display: grid;
-                            grid-template-columns: 1fr 1fr;
-                            gap: 40px;
-                            margin-top: 15px;
-                        }
-                
-                        .sig-block {
-                            /* Container für einen Unterschriftenblock */
-                        }
+                    .container {
+                        width: 100%;
+                        max-width: 195mm;
+                        margin: 0 auto;
+                    }
+            
+                    /* Header */
+                    .header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 10px;
+                    }
+            
+                    .header h1 {
+                        font-size: 14pt;
+                        margin: 0;
+                    }
+            
+                    .logo {
+                        color: #db261f;
+                        font-weight: 900;
+                        font-size: 120pt;
+                        position: absolute;
+                        top: -38px;
+                        right: 30px;
+                    }
+            
+                    /* Top Info */
+                    .top-fields {
+                        display: flex;
+                        gap: 10px;
+                        margin-bottom: 10px;
+                    }
+            
+                    .field-group {
+                        display: flex;
+                        align-items: flex-end;
+                        border-bottom: 1px solid #000;
+                    }
+            
+                    .field-group label {
+                        font-weight: bold;
+                        margin-right: 3px;
+                        white-space: nowrap;
+                    }
+            
+                    .field-group input {
+                        border: none;
+                        width: 100%;
+                        outline: none;
+                        font-size: 9pt;
+                        background: transparent;
+                    }
+            
+                    /* Table */
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+            
+                    td {
+                        padding: 3px 0;
+                        vertical-align: middle;
+                    }
+            
+                    .col-num {
+                        width: 15px;
+                        font-weight: bold;
+                        font-size: 9pt;
+                    }
+            
+                    .col-label {
+                        width: 180px;
+                        font-weight: bold;
+                        font-size: 9pt;
+                    }
+            
+                    /* Kleine Schrift für Hilfstexte */
+                    .small-label {
+                        font-size: 9pt;
+                        font-weight: normal;
+                    }
+            
+                    .inline-input {
+                        border: none;
+                        border-bottom: 1px solid #000;
+                        outline: none;
+                        font-size: 8.5pt;
+                        background: transparent;
+                        text-align: center;
+                    }
+            
+                    /* Krank Section */
+                    .krank-container {
+                        margin-top: 10px;
+                        font-size: 8.7pt;
+                    }
+            
+                    .krank-title {
+                        font-weight: bold;
+                        font-size: 8.6pt;
+                    }
+            
+                    /* Bottom Grid */
+                    .bottom-grid {
+                        display: grid;
+                        grid-template-columns: 1fr 320px;
+                        gap: 15px;
+                        margin-top: 10px;
+                    }
+            
+                    .remarks-area div {
+                        margin-bottom: 6px;
+                        display: flex;
+                        font-size: 8pt;
+                        font-weight: bold;
+                        align-items: center;
+                    }
+            
+                    .doctor-box {
+                        border: 1px solid #000;
+                        padding: 5px;
+                        min-height: 55px;
+						max-width: 270px;
+                        font-size: 6pt;
+                    }
+            
+                    .doctor-stamp {
+                        margin-top: 12px;
+                        border-top: 1px dotted #666;
+                        font-size: 6pt;
+                    }
+            
+                    /* Signatures */
+                    .signature-section {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr; /* Zwei Spalten: Antragsteller und Vorgesetzter */
+                        gap: 40px;
+                        margin-top: 15px;
+                    }
+            
+                    .sig-block {
+                        /* Container für einen Unterschriftenblock */
+                    }
 
-                        .sig-row {
-                            display: flex;
-                            gap: 20px;
-                            margin-top: 30px;
-                            align-items: flex-end;
-                        }
+                    .sig-row {
+                        display: flex;
+                        gap: 20px;
+                        margin-top: 30px; /* Platz für die Unterschrift (Bild) */
+                        align-items: flex-end;
+                    }
 
-                        .sig-field {
-                            flex: 1;
-                            display: flex;
-                            flex-direction: column;
-                            justify-content: flex-end;
-                        }
-                
-                        .sig-line {
-                            border-bottom: 1px solid #000;
-                            height: 1px;
-                            width: 100%;
-                            margin-bottom: 2px;
-                        }
+                    .sig-field {
+                        flex: 1;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: flex-end;
+                    }
+            
+                    .sig-line {
+                        border-bottom: 1px solid #000;
+                        height: 1px;
+                        width: 100%;
+                        margin-bottom: 2px;
+                    }
 
-                        .sig-val {
-                            text-align: center;
-                            font-size: 9pt;
-                            margin-bottom: 2px;
-                            min-height: 15px;
-                            position: relative;
-                        }
+                    .sig-val {
+                        text-align: center;
+                        font-size: 9pt;
+                        margin-bottom: 2px;
+                        min-height: 15px;
+                        position: relative;
+                    }
 
-                        .sig-label {
-                            font-size: 7pt;
-                            text-align: center;
-                        }
-                    </style>
-                </head>
+                    .sig-label {
+                        font-size: 7pt;
+                        text-align: center;
+                    }
+                </style>
+            </head>
                 
                 <body>
                 <div class="logo">
