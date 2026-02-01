@@ -1,0 +1,16 @@
+{
+    "name": "Schichtkalender Manager",
+    "short_name": "Manager",
+    "description": "Manager Dashboard für Urlaubsanträge",
+    "start_url": "./manager.html",
+    "display": "standalone",
+    "background_color": "#333333",
+    "theme_color": "#333333",
+    "icons": [
+        {
+            "src": "ios/192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ]
+}

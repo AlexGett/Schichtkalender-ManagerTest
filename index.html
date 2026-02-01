@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#f4f4f4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Schichtkalender</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" sizes="180x180" href="ios/180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="ios/152.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="ios/167.png">
+    
+    <!-- jsPDF für PDF-Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="calendar-container" id="calendarContainer">
+        <span class="header-icon phone-icon-position beat-animation" id="openPhoneDialog">📞</span>
+        <span class="header-icon info-icon-position beat-animation" id="openShiftInfoDialog">ℹ️</span>
+        <span id="todayButton" class="header-icon today-icon-position beat-animation">🗓️</span>
+        <span id="openImportantDatesDialog" style="display: none;"></span>
+        <img src="logo.PNG" alt="Logo" class="logo" id="openSettingsDialog">
+
+        <div class="header-section">
+            <h1 id="currentYearDisplay">2025</h1>
+        </div>
+        <div class="greeting-text">Hallo</div>
+        <h2 id="profileNameDisplay">Profil</h2>
+        <div class="month-grid">
+        </div>
+    </div>
+
+    <div class="dialog-overlay" id="phoneDialogOverlay">
+        <div class="dialog">
+            <button class="close-button" id="closePhoneDialog">&times;</button>
+        </div>
+    </div>
+
+    <div class="dialog-overlay" id="holidayDialogOverlay">
+        <div class="dialog">
+            <button class="close-button" id="closeHolidayDialog">&times;</button>
+            <h3>Feiertag</h3>
+            <div id="holidayTranslations"></div>
+        </div>
+    </div>
+
+    <div class="dialog-overlay" id="shiftInfoDialogOverlay">
+        <div class="dialog shift-info-dialog">
+            <button class="close-button" id="closeShiftInfoDialog">&times;</button>
+            <h3>Schichtzeiten & Farben</h3>
+            <div class="shift-info-item">
+                <div class="shift-color-box fruehschicht"></div>
+                <span id="infoFruehschicht">Frühschicht: 06:00 Uhr - 14:00 Uhr</span>
+            </div>
+            <div class="shift-info-item">
+                <div class="shift-color-box spaetschicht"></div>
+                <span id="infoSpaetschicht">Spätschicht: 14:00 Uhr - 22:00 Uhr</span>
+            </div>
+            <div class="shift-info-item">
+                <div class="shift-color-box nachtschicht"></div>
+                <span id="infoNachtschicht">Nachtschicht: 22:00 Uhr - 06:00 Uhr</span>
+            </div>
+            <div class="shift-info-item">
+                <div class="shift-color-box freischicht"></div>
+                <span>Freischicht (Frei)</span>
+            </div>
+            <div class="shift-info-item">
+                <div class="shift-color-box samstag"></div>
+                <span>Samstag</span>
+            </div>
+            <div class="shift-info-item">
+                <div class="shift-color-box sonntag"></div>
+                <span>Sonntag</span>
+            </div>
+            <div class="shift-info-item">
+                <div class="shift-color-box feiertag"></div>
+                <span>Feiertag</span>
+            </div>
+            <div class="shift-info-item">
+                <div class="shift-color-box urlaub"></div>
+                <span>Urlaub</span>
+            </div>
+
+            <hr class="info-divider">
+
+            <h3>Weitere Informationen</h3>
+            <ul>
+            </ul>
+            <div id="infoFilesList" class="info-files-list">
+                <p class="loading-message">Lade Informationen...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog-overlay" id="settingsDialogOverlay">
+        <div class="dialog">
+            <button class="close-button" id="closeSettingsDialog">&times;</button>
+            <h3>Einstellungen</h3>
+
+            <div class="settings-option">
+                <label for="toggleAnimations">Pulsieren ausschalten:</label>
+                <input type="checkbox" id="toggleAnimations">
+            </div>
+            <div class="settings-option">
+                <label for="borderColorPicker">Randfarbe wählen:</label>
+                <input type="color" id="borderColorPicker" value="#0161FD">
+            </div>
+            <div class="settings-option">
+                <label for="toggleAutoDarkMode">Automatischer Dark Mode:</label>
+                <input type="checkbox" id="toggleAutoDarkMode">
+            </div>
+            <div class="settings-option">
+                <label for="toggleDarkMode">Dark Mode aktivieren:</label>
+                <input type="checkbox" id="toggleDarkMode">
+            </div>
+
+            <hr>
+
+            <div class="settings-section">
+                <h4 id="settingsHeaderProfile">Profileinstellungen</h4>
+                <div class="settings-option">
+                    <label for="profileVornameInput">Vorname:</label>
+                    <input type="text" id="profileVornameInput" placeholder="Ihr Vorname">
+                </div>
+                <div class="settings-option">
+                    <label for="profileNachnameInput">Nachname:</label>
+                    <input type="text" id="profileNachnameInput" placeholder="Ihr Nachname">
+                </div>
+                <div class="settings-option">
+                    <label for="profilePersonalNummer">Personalnummer:</label>
+                    <input type="text" id="profilePersonalNummer" placeholder="z.B. 12345">
+                </div>
+                <div class="settings-option">
+                    <label>Schichtzeiten (Start - Ende):</label>
+                    <div class="shift-time-row">
+                        <span>Früh:</span>
+                        <input type="time" id="profileFruehStart" aria-label="Startzeit Frühschicht">
+                        <input type="time" id="profileFruehEnd" aria-label="Endzeit Frühschicht">
+                    </div>
+                    <div class="shift-time-row">
+                        <span>Spät:</span>
+                        <input type="time" id="profileSpaetStart" aria-label="Startzeit Spätschicht">
+                        <input type="time" id="profileSpaetEnd" aria-label="Endzeit Spätschicht">
+                    </div>
+                    <div class="shift-time-row">
+                        <span>Nacht:</span>
+                        <input type="time" id="profileNachtStart" aria-label="Startzeit Nachtschicht">
+                        <input type="time" id="profileNachtEnd" aria-label="Endzeit Nachtschicht">
+                    </div>
+                </div>
+                <div class="settings-option">
+                    <label>Unterschrift zeichnen:</label>
+                    <div class="signature-container">
+                        <canvas id="signatureCanvas" width="300" height="120" class="signature-canvas"></canvas>
+                    </div>
+                    <div class="signature-buttons">
+                        <button id="clearSignatureButton" class="confirm-button btn-red">Löschen</button>
+                        <button id="resetSignatureButton" class="confirm-button btn-grey">Zurücksetzen</button>
+                    </div>
+                </div>
+                <button id="saveProfileButton" class="confirm-button">Profil speichern</button>
+            </div>
+
+            <hr>
+
+            <div class="settings-section">
+                <button id="openCustomShiftSystemSettings" class="action-button">Eigenes Schichtsystem festlegen</button>
+                <div id="customShiftSystemSection">
+                    <h4 id="settingsHeaderCustomShift">Schichtsystem-Details</h4>
+                    <p class="small-text">Hier kannst du dein eigenes Schichtsystem definieren. Trenne die Schichttypen mit Kommas (z.B. F,F,F,N,N,Frei).</p>
+                    <div class="settings-option">
+                        <label for="customShiftSequence">Schicht- & Freie-Tage-Sequenz (z.B. F,F,N,N,S,S,Frei,Frei):</label>
+                        <input type="text" id="customShiftSequence" placeholder="F,F,F,F,F,Frei,Frei,N,N,N,N,N,Frei,Frei,S,S,S,S,S,Frei,Frei">
+                    </div>
+                    <div class="settings-option">
+                        <label for="customShiftStartDate">Startdatum des Zyklus (TT/MM/JJJJ):</label>
+                        <input type="date" id="customShiftStartDate">
+                    </div>
+                    <div class="settings-option">
+                        <label for="customShiftStartType">Schichtart am Startdatum (z.B. Früh, Nacht, Spät, Frei):</label>
+                        <input type="text" id="customShiftStartType" placeholder="Früh">
+                    </div>
+                    <div class="button-group">
+                        <button id="saveCustomShiftSystem" class="confirm-button preset-button btn-blue">Speichern</button>
+                        <button id="setStandardShiftSystem" class="confirm-button preset-button btn-grey">Standard</button>
+                        <button id="setGroupAShiftSystem" class="confirm-button preset-button">Gruppe A</button>
+                        <button id="setGroupBShiftSystem" class="confirm-button preset-button">Gruppe B</button>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-section">
+                <h4 id="settingsHeaderBackup">Backup & Wiederherstellung</h4>
+                <p class="backup-intro">Bei einem Handywechsel kann der aktuelle Kalender gesichert werden:</p>
+                <ol class="backup-steps">
+                    <li>Auf dem alten Handy ein Backup erstellen</li>
+                    <li>Die Datei teilen (z.B. über WhatsApp)</li>
+                    <li>Auf dem neuen Handy das Backup laden</li>
+                </ol>
+                <button class="action-button" id="backupSettingsButton">Backup erstellen</button>
+                <button class="action-button" id="restoreSettingsButton">Backup laden</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog-overlay" id="yearInputDialogOverlay">
+        <div class="dialog year-input-dialog">
+            <button class="close-button" id="closeYearInputDialog">&times;</button>
+            <h3>Jahr auswählen</h3>
+            <label for="yearInput">Geben Sie ein Jahr ein:</label>
+            <div class="input-group">
+                <button class="year-nav" id="decreaseYear">-</button>
+                <input type="number" id="yearInput" min="1900" max="2100">
+                <button class="year-nav" id="increaseYear">+</button>
+            </div>
+            <button id="setYearButton" class="confirm-button">Bestätigen</button>
+        </div>
+    </div>
+
+    <div class="dialog-overlay" id="noteDialogOverlay">
+        <div class="dialog" id="noteDialog">
+            <button class="close-button" id="closeNoteDialog">&times;</button>
+            <h3 id="noteDialogTitle">Notiz für [Datum]</h3>
+            <textarea id="noteInput" placeholder="Hier Notizen eingeben..." aria-labelledby="noteDialogTitle"></textarea>
+            <div class="button-group">
+                <button id="urlaubsantragButton">Urlaubsantrag</button>
+                <button id="saveNoteButton">Notiz speichern</button>
+                <button id="toggleVacationButton">Als Urlaub markieren</button>
+                <button id="deleteNoteButton">Notiz löschen</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog-overlay" id="importantDatesDialogOverlay">
+        <div class="dialog">
+            <button class="close-button" id="closeImportantDatesDialog">&times;</button>
+            <h3>Wichtige Termine</h3>
+            <div class="settings-option">
+                <label for="importantDateInput">Datum:</label>
+                <input type="date" id="importantDateInput">
+            </div>
+            <div class="settings-option">
+                <label for="importantDateName">Bezeichnung:</label>
+                <input type="text" id="importantDateName" placeholder="z.B. Geburtstag Max">
+            </div>
+            <div class="settings-option">
+                <label for="importantDateEmoji">Emoji:</label>
+                <div class="emoji-input-container">
+                    <input type="text" id="importantDateEmoji" placeholder="🎂" maxlength="5">
+                    <div class="emoji-quick-select">
+                        <span class="emoji-option">🎂</span>
+                        <span class="emoji-option">🎉</span>
+                        <span class="emoji-option">❤️</span>
+                        <span class="emoji-option">⚕️</span>
+                        <span class="emoji-option">💍</span>
+                        <span class="emoji-option">👶</span>
+                        <span class="emoji-option">🏠</span>
+                        <span class="emoji-option">🚗</span>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-option inline">
+                <label for="importantDateRecurring">Jährlich wiederholen:</label>
+                <input type="checkbox" id="importantDateRecurring">
+            </div>
+            <button id="addImportantDateBtn" class="confirm-button">Hinzufügen</button>
+            
+            <hr>
+            <h4>Gespeicherte Termine</h4>
+            <ul id="importantDatesList" class="important-dates-list"></ul>
+        </div>
+    </div>
+
+    <div class="dialog-overlay" id="urlaubsantragDialogOverlay">
+        <div class="dialog">
+            <button class="close-button" id="closeUrlaubsantragDialog">&times;</button>
+            <h3>Urlaubsantrag</h3>
+            <div class="urlaubsantrag-content">
+                <div class="urlaubsantrag-field">
+                    <label for="urlaubsantrag_name">Name:</label>
+                    <input type="text" id="urlaubsantrag_name" readonly>
+                </div>
+                <div class="urlaubsantrag-field">
+                    <label for="urlaubsantrag_personalnummer">Personalnummer:</label>
+                    <input type="text" id="urlaubsantrag_personalnummer" readonly>
+                </div>
+                <div class="urlaubsantrag-field">
+                    <label for="urlaubsantrag_date_from">Datum vom:</label>
+                    <input type="date" id="urlaubsantrag_date_from" readonly>
+                </div>
+                <div class="urlaubsantrag-field">
+                    <label for="urlaubsantrag_date_to">Datum bis:</label>
+                    <input type="date" id="urlaubsantrag_date_to">
+                </div>
+                <div class="urlaubsantrag-field">
+                    <label for="urlaubsantrag_grund">Grund des Urlaubs:</label>
+                    <textarea id="urlaubsantrag_grund" placeholder="z.B. Privaturlaub, Krankenurlaub..."></textarea>
+                </div>
+                <div class="urlaubsantrag-field">
+                    <label>Unterschrift:</label>
+                    <div id="urlaubsantrag_signature_preview" class="signature-preview-box"></div>
+                </div>
+                <div class="button-group">
+                    <button id="generatePdfButton" class="confirm-button">Als PDF generieren</button>
+                    <button id="sendUrlaubsantragButton" class="confirm-button">PDF versenden</button>
+                    <button id="exportUrlaubsantragButton" class="confirm-button" style="background-color: #28a745;">Für Manager exportieren</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="update-banner">
+        <span>Eine neue Version ist verfügbar!</span>
+        <button id="reload-button">Aktualisieren</button>
+    </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
