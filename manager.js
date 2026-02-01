@@ -164,6 +164,7 @@ function loadRequestData(data) {
     const d1 = new Date(data.dateFrom).toLocaleDateString('de-DE');
     const d2 = new Date(data.dateTo).toLocaleDateString('de-DE');
     document.getElementById('dispDate').textContent = `${d1} - ${d2}`;
+    document.getElementById('dispDays').textContent = data.workingDays !== undefined ? data.workingDays : '-';
     
     // Typ Text holen
     const types = uiTranslations['de'].vacation.types;
