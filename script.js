@@ -3886,9 +3886,14 @@ function generateUrlaubsantragPDF(action = 'download') {
 		const element = document.createElement('div');
 		element.innerHTML = htmlContent;
 
+		let pdfFilenameName = name;
+		if (userProfile.nachname && userProfile.vorname) {
+			pdfFilenameName = `${userProfile.nachname}, ${userProfile.vorname}`;
+		}
+
 		const opt = {
 			margin: [5, 5, 5, 5],
-			filename: `Urlaubsantrag_${name}_${formatGermanDate(dateFrom)}-${formatGermanDate(dateTo)}.pdf`,
+			filename: `${pdfFilenameName}, ${formatGermanDate(dateFrom)} - ${formatGermanDate(dateTo)}.pdf`,
 			image: { type: 'jpeg', quality: 0.98 },
 			html2canvas: {
 				scale: 2,
@@ -4049,6 +4054,8 @@ if (exportUrlaubsantragButton) {
 
         const data = {
             name: name,
+            vorname: userProfile.vorname,
+            nachname: userProfile.nachname,
             personalNummer: document.getElementById('urlaubsantrag_personalnummer').value,
             abteilung: userProfile.abteilung || '',
             dateFrom: dateFrom,

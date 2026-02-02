@@ -679,9 +679,14 @@ function generateFinalPDF() {
         // und nicht auf die Bildschirmbreite des Handys gequetscht wird.
         // element.style.width = '210mm';
 
+        let pdfName = data.name;
+        if (data.nachname && data.vorname) {
+            pdfName = `${data.nachname}, ${data.vorname}`;
+        }
+
         const opt = {
             margin: [5, 5, 5, 5],
-            filename: `Urlaubsantrag_${data.name}_${managerDecision}.pdf`,
+            filename: `${pdfName}, ${formatGermanDate(data.dateFrom)} - ${formatGermanDate(data.dateTo)}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { 
                 scale: 2,
