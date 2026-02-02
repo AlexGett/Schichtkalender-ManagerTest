@@ -70,7 +70,7 @@
             <div class="detail-row"><span class="detail-label">Art:</span> <span class="detail-value" id="dispType">-</span></div>
             <div class="detail-row"><span class="detail-label">Grund/Bemerkung:</span> <span class="detail-value" id="dispReason">-</span></div>
             
-            <div style="margin-top: 15px;">
+            <div style="margin-top: 15px; display: none;">
                 <span class="detail-label">Unterschrift Mitarbeiter:</span>
                 <div class="employee-sig-box" id="dispSig">
                     <span style="color:#999; font-style:italic;">Keine Unterschrift</span>
@@ -89,18 +89,25 @@
                     </button>
                 </div>
 
-                <label style="font-weight:bold; display:block; margin-bottom:5px;">Unterschrift Vorgesetzter:</label>
-                <div class="signature-container">
-                    <canvas id="managerSignatureCanvas" width="400" height="150" class="signature-canvas" style="width:100%;"></canvas>
-                </div>
-                <div class="signature-buttons">
-                    <button id="clearManagerSig" class="confirm-button btn-red">Löschen</button>
-                    <button id="saveManagerSig" class="confirm-button btn-blue">Speichern</button>
-                    <button id="uploadManagerSig" class="confirm-button btn-grey">Bild laden</button>
-                    <input type="file" id="managerSigInput" accept="image/*" style="display:none;">
+                <div id="managerSignatureSection">
+                    <div id="managerSignatureHeader" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; margin-bottom:10px; padding: 10px; background-color: #f8f9fa; border-radius: 5px; border: 1px solid #eee;">
+                        <label style="font-weight:bold; cursor:pointer; margin:0; color:#333;">Unterschrift Vorgesetzter</label>
+                        <i class="fas fa-chevron-up" id="managerSigToggleIcon" style="color:#555;"></i>
+                    </div>
+                    <div id="managerSignatureContent">
+                        <div class="signature-container">
+                            <canvas id="managerSignatureCanvas" width="400" height="150" class="signature-canvas" style="width:100%;"></canvas>
+                        </div>
+                        <div class="signature-buttons">
+                            <button id="clearManagerSig" class="confirm-button btn-red">Löschen</button>
+                            <button id="saveManagerSig" class="confirm-button">Speichern</button>
+                            <button id="uploadManagerSig" class="confirm-button btn-grey">Bild laden</button>
+                            <input type="file" id="managerSigInput" accept="image/*" style="display:none;">
+                        </div>
+                    </div>
                 </div>
 
-                <button id="generateFinalPdfBtn" class="action-button" style="margin-top: 20px; background-color: #007bff;" disabled>
+                <button id="generateFinalPdfBtn" class="action-button" style="margin-top: 20px;" disabled>
                     <i class="fas fa-file-pdf"></i> Finales PDF erstellen
                 </button>
             </div>

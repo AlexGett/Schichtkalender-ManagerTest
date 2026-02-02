@@ -127,6 +127,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('generateFinalPdfBtn').addEventListener('click', generateFinalPDF);
 
+    // Signature Toggle Logic
+    const sigHeader = document.getElementById('managerSignatureHeader');
+    const sigContent = document.getElementById('managerSignatureContent');
+    const sigIcon = document.getElementById('managerSigToggleIcon');
+
+    if (sigHeader && sigContent && sigIcon) {
+        // Initial state: Collapse if signature exists
+        if (managerSettings.signature) {
+            sigContent.style.display = 'none';
+            sigIcon.className = 'fas fa-chevron-down';
+        }
+
+        sigHeader.addEventListener('click', () => {
+            const isHidden = sigContent.style.display === 'none';
+            sigContent.style.display = isHidden ? 'block' : 'none';
+            sigIcon.className = isHidden ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+        });
+    }
+
     // Dark Mode Check
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         document.body.classList.add('dark-mode');
@@ -253,6 +272,10 @@ function generateFinalPDF() {
     if (metaViewport) {
         metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
     }
+
+    // Temporarily remove dark mode for PDF generation
+    const wasDarkMode = document.body.classList.contains('dark-mode');
+    if (wasDarkMode) document.body.classList.remove('dark-mode');
 
     try {
         const data = currentRequestData;
@@ -670,15 +693,18 @@ function generateFinalPDF() {
         };
 
         html2pdf().set(opt).from(element).save().then(() => {
+            if (wasDarkMode) document.body.classList.add('dark-mode');
             restoreViewport();
             Toastify({ text: "PDF erfolgreich erstellt!", duration: 3000, style: { background: "#28a745" } }).showToast();
         }).catch(err => {
+            if (wasDarkMode) document.body.classList.add('dark-mode');
             restoreViewport();
             console.error(err);
             alert('Fehler beim Erstellen des PDFs');
         });
 
     } catch (e) {
+        if (wasDarkMode) document.body.classList.add('dark-mode');
         restoreViewport();
         console.error(e);
         alert('Ein Fehler ist aufgetreten');
