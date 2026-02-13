@@ -115,6 +115,7 @@ let vacationData = JSON.parse(localStorage.getItem('calendarVacations')) || {};
 let importantDates = JSON.parse(localStorage.getItem('importantDates')) || [];
 // NEU: Telefonnummern aus localStorage laden
 let phoneNumbers = JSON.parse(localStorage.getItem('phoneNumbers')) || [];
+const APP_VERSION = '1.2.20'; // Aktuelle App-Version
 
 // --- SPRACHEINSTELLUNGEN ---
 let currentLanguage = localStorage.getItem('calendarLanguage') || 'de';
@@ -194,6 +195,7 @@ function applyLanguageToUI() {
         };
         
         setLabel('toggleAnimations', t.settings.animations);
+        setLabel('toggleScrollToToday', t.settings.scrollToToday);
         setLabel('borderColorPicker', t.settings.borderColor);
         setLabel('toggleDarkMode', t.settings.darkMode);
         setLabel('toggleAutoDarkMode', t.settings.autoDarkMode);
@@ -235,6 +237,12 @@ function applyLanguageToUI() {
         
         const btnUploadSig = document.getElementById('signatureUploadButton');
         if (btnUploadSig) btnUploadSig.textContent = t.settings.upload;
+
+        // Version Display
+        const versionDisplay = document.getElementById('versionDisplay');
+        if (versionDisplay) {
+            versionDisplay.textContent = `${t.settings.version}: ${APP_VERSION}`;
+        }
 
         // Headers in Settings (jetzt mit IDs für zuverlässige Auswahl)
         const headerProfile = document.getElementById('settingsHeaderProfile');
@@ -1068,6 +1076,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	registerServiceWorker(); // Service Worker mit Update-Funktion registrieren
 	createBottomAppDock(); // NEU: Untere App-Leiste erstellen und Elemente verschieben
+
+    // NEU: Zum aktuellen Tag scrollen, falls aktiviert
+    if (localStorage.getItem('scrollToTodayEnabled') === 'true') {
+        setTimeout(() => {
+            const today = new Date();
+            if (today.getFullYear() === currentCalendarYear) {
+                const todayMonth = today.getMonth();
+                const monthCards = document.querySelectorAll('.month-card');
+                if (monthCards[todayMonth]) {
+                    monthCards[todayMonth].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }, 800); // Kurze Verzögerung für Rendering
+    }
 });
 
 // --- FUNKTIONEN FÜR BENUTZERDEFINIERTES SCHICHTSYSTEM ---
@@ -1977,6 +1999,7 @@ setupDialog('openImportantDatesDialog', 'importantDatesDialogOverlay', 'closeImp
 
 const settingsDialogOverlay = document.getElementById('settingsDialogOverlay');
 const toggleAnimationsCheckbox = document.getElementById('toggleAnimations');
+const toggleScrollToTodayCheckbox = document.getElementById('toggleScrollToToday');
 const borderColorPicker = document.getElementById('borderColorPicker');
 const calendarContainer = document.getElementById('calendarContainer');
 const toggleDarkModeCheckbox = document.getElementById('toggleDarkMode');
@@ -1989,6 +2012,13 @@ if (savedAnimationState === 'true' || savedAnimationState === null) {
 } else {
 	toggleAnimationsCheckbox.checked = false;
 	calendarContainer.classList.remove('no-animation');
+}
+
+if (toggleScrollToTodayCheckbox) {
+    toggleScrollToTodayCheckbox.checked = localStorage.getItem('scrollToTodayEnabled') === 'true';
+    toggleScrollToTodayCheckbox.addEventListener('change', () => {
+        localStorage.setItem('scrollToTodayEnabled', toggleScrollToTodayCheckbox.checked);
+    });
 }
 
 const savedBorderColor = localStorage.getItem('calendarBorderColor');

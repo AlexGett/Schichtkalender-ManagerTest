@@ -39,6 +39,7 @@ const uiTranslations = {
             language: 'Sprache / Language',
             title: 'Einstellungen',
             animations: 'Animationen deaktivieren',
+            scrollToToday: 'Beim Start zu Heute scrollen',
             borderColor: 'Rahmenfarbe',
             darkMode: 'Dark Mode',
             autoDarkMode: 'Auto Dark Mode',
@@ -92,7 +93,8 @@ const uiTranslations = {
             shiftColors: 'Schichtzuordnung (Farben)',
             apply: 'Übernehmen',
             guest: 'Gast',
-            idLabel: 'ID'
+            idLabel: 'ID',
+            version: 'Version'
         },
         vacation: {
             title: 'Urlaubsantrag',
@@ -256,6 +258,7 @@ const uiTranslations = {
             language: 'Sprache / Language',
             title: 'Settings',
             animations: 'Disable animations',
+            scrollToToday: 'Scroll to today on startup',
             borderColor: 'Border color',
             darkMode: 'Dark Mode',
             autoDarkMode: 'Auto Dark Mode',
@@ -309,7 +312,8 @@ const uiTranslations = {
             shiftColors: 'Shift Assignment (Colors)',
             apply: 'Apply',
             guest: 'Guest',
-            idLabel: 'ID'
+            idLabel: 'ID',
+            version: 'Version'
         },
         vacation: {
             title: 'Vacation Request',
@@ -473,6 +477,7 @@ const uiTranslations = {
             language: 'Sprache / Language',
             title: 'Настройки',
             animations: 'Отключить анимацию',
+            scrollToToday: 'Прокрутить к сегодня при старте',
             borderColor: 'Цвет рамки',
             darkMode: 'Темный режим',
             autoDarkMode: 'Авто темный режим',
@@ -523,7 +528,8 @@ const uiTranslations = {
             shiftColors: 'Назначение смен (Цвета)',
             apply: 'Применить',
             guest: 'Гость',
-            idLabel: 'ID'
+            idLabel: 'ID',
+            version: 'Версия'
         },
         vacation: {
             title: 'Заявление на отпуск',
@@ -687,6 +693,7 @@ const uiTranslations = {
             language: 'Sprache / Language',
             title: 'Ayarlar',
             animations: 'Animasyonları devre dışı bırak',
+            scrollToToday: 'Başlangıçta bugüne kaydır',
             borderColor: 'Çerçeve rengi',
             darkMode: 'Karanlık Mod',
             autoDarkMode: 'Otomatik Karanlık Mod',
@@ -737,7 +744,8 @@ const uiTranslations = {
             shiftColors: 'Vardiya Ataması (Renkler)',
             apply: 'Uygula',
             guest: 'Misafir',
-            idLabel: 'ID'
+            idLabel: 'ID',
+            version: 'Sürüm'
         },
         vacation: {
             title: 'İzin İsteği',
@@ -901,6 +909,7 @@ const uiTranslations = {
             language: 'Gjuha / Language',
             title: 'Cilësimet',
             animations: 'Çaktivizo animacionet',
+            scrollToToday: 'Shko te dita e sotme në fillim',
             borderColor: 'Ngjyra e kornizës',
             darkMode: 'Modaliteti i errët',
             autoDarkMode: 'Modaliteti automatik i errët',
@@ -951,7 +960,8 @@ const uiTranslations = {
             shiftColors: 'Caktimi i ndërrimeve (Ngjyrat)',
             apply: 'Apliko',
             guest: 'Mysafir',
-            idLabel: 'ID'
+            idLabel: 'ID',
+            version: 'Versioni'
         },
         vacation: {
             title: 'Kërkesë për pushim',
@@ -1115,6 +1125,7 @@ const uiTranslations = {
             language: 'اللغة / Language',
             title: 'الإعدادات',
             animations: 'تعطيل الرسوم المتحركة',
+            scrollToToday: 'التمرير إلى اليوم عند البدء',
             borderColor: 'لون الإطار',
             darkMode: 'الوضع الداكن',
             autoDarkMode: 'الوضع الداكن التلقائي',
@@ -1165,7 +1176,8 @@ const uiTranslations = {
             shiftColors: 'تخصيص الورديات (الألوان)',
             apply: 'تطبيق',
             guest: 'ضيف',
-            idLabel: 'هوية'
+            idLabel: 'هوية',
+            version: 'الإصدار'
         },
         vacation: {
             title: 'طلب إجازة',
@@ -1329,6 +1341,7 @@ const uiTranslations = {
             language: 'Jezik / Language',
             title: 'Postavke',
             animations: 'Onemogući animacije',
+            scrollToToday: 'Pomakni na danas pri pokretanju',
             borderColor: 'Boja obruba',
             darkMode: 'Tamni način',
             autoDarkMode: 'Automatski tamni način',
@@ -1379,7 +1392,8 @@ const uiTranslations = {
             shiftColors: 'Dodjela smjena (Boje)',
             apply: 'Primijeni',
             guest: 'Gost',
-            idLabel: 'ID'
+            idLabel: 'ID',
+            version: 'Verzija'
         },
         vacation: {
             title: 'Zahtjev za godišnji',
@@ -1543,6 +1557,7 @@ const uiTranslations = {
             language: 'Jazyk / Language',
             title: 'Nastavenia',
             animations: 'Vypnúť animácie',
+            scrollToToday: 'Pri štarte posunúť na dnešok',
             borderColor: 'Farba okraja',
             darkMode: 'Tmavý režim',
             autoDarkMode: 'Auto tmavý režim',
@@ -1593,7 +1608,8 @@ const uiTranslations = {
             shiftColors: 'Priradenie zmien (Farby)',
             apply: 'Použiť',
             guest: 'Hosť',
-            idLabel: 'ID'
+            idLabel: 'ID',
+            version: 'Verzia'
         },
         vacation: {
             title: 'Žiadosť o dovolenku',
