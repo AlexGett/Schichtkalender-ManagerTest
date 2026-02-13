@@ -1,4 +1,4 @@
-const CACHE_NAME = 'schichtkalender-cache-test-v1.2.22';
+const CACHE_NAME = 'schichtkalender-cache-test-v1.2.27';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -46,6 +46,14 @@ self.addEventListener('message', (event) => {
         // Diese Anweisung sorgt dafür, dass der neue Service Worker sofort aktiv wird
         // und den alten ersetzt, ohne dass der Benutzer alle Tabs schließen muss.
         self.skipWaiting();
+    }
+    // NEU: Version an den Client senden
+    if (event.data && event.data.type === 'GET_VERSION') {
+        const versionMatch = CACHE_NAME.match(/v(\d+\.\d+\.\d+)/);
+        const version = versionMatch ? versionMatch[1] : 'Unknown';
+        if (event.ports && event.ports[0]) {
+            event.ports[0].postMessage({ version });
+        }
     }
 });
 

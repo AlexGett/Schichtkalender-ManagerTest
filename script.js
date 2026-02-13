@@ -115,7 +115,7 @@ let vacationData = JSON.parse(localStorage.getItem('calendarVacations')) || {};
 let importantDates = JSON.parse(localStorage.getItem('importantDates')) || [];
 // NEU: Telefonnummern aus localStorage laden
 let phoneNumbers = JSON.parse(localStorage.getItem('phoneNumbers')) || [];
-const APP_VERSION = '1.2.20'; // Aktuelle App-Version
+let appVersion = '...'; // Version wird dynamisch geladen
 
 // --- SPRACHEINSTELLUNGEN ---
 let currentLanguage = localStorage.getItem('calendarLanguage') || 'de';
@@ -242,7 +242,7 @@ function applyLanguageToUI() {
         // Version Display
         const versionDisplay = document.getElementById('versionDisplay');
         if (versionDisplay) {
-            versionDisplay.textContent = `${t.settings.version}: ${APP_VERSION}`;
+            versionDisplay.textContent = `${t.settings.version}: ${appVersion}`;
         }
 
         // Headers in Settings (jetzt mit IDs für zuverlässige Auswahl)
@@ -1053,6 +1053,8 @@ document.addEventListener('DOMContentLoaded', () => {
     injectLanguageSelector(); // NEU: Sprachauswahl einfügen
     applyLanguageToUI(); // NEU: Initiale Übersetzung anwenden
 
+    determineAppVersion(); // NEU: Version vom Service Worker abrufen
+
 	generateCalendar(currentCalendarYear); // Initialer Kalenderaufbau
 
     injectModelSelector(); // NEU: Modell-Auswahl in Einstellungen einfügen
@@ -1083,6 +1085,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800); // Kurze Verzögerung für Rendering
     }
 });
+
+// NEU: Funktion zum Abrufen der Version aus dem Service Worker
+function determineAppVersion() {
+    const updateUI = (ver) => {
+        appVersion = ver;
+        const versionDisplay = document.getElementById('versionDisplay');
+        if (versionDisplay && uiTranslations[currentLanguage]) {
+            versionDisplay.textContent = `${uiTranslations[currentLanguage].settings.version}: ${appVersion}`;
+        }
+    };
+
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        const messageChannel = new MessageChannel();
+        messageChannel.port1.onmessage = (event) => {
+            if (event.data && event.data.version) {
+                updateUI(event.data.version);
+            }
+        };
+        navigator.serviceWorker.controller.postMessage({ type: 'GET_VERSION' }, [messageChannel.port2]);
+    } else {
+        // Fallback: Versuche die Datei direkt zu lesen (z.B. beim ersten Laden)
+        fetch('./service-worker.js')
+            .then(res => res.text())
+            .then(text => {
+                const match = text.match(/CACHE_NAME\s*=\s*['"`].*v(\d+\.\d+\.\d+)['"`]/);
+                if (match) updateUI(match[1]);
+            })
+            .catch(err => console.log('Version detection failed', err));
+    }
+}
 
 // NEU: Funktion zum Wechseln der Tabs
 function switchSettingsTab(tabName) {
@@ -2569,7 +2601,7 @@ function registerServiceWorker() {
 						});
 					});
 
-					const reloadButton = document.querySelector("#reload-button");
+                    const reloadButton = document.querySelector("#reload-button");
 					if (reloadButton) {
 						reloadButton.addEventListener('click', () => {
 							// Sende eine Nachricht an den wartenden Service Worker, damit er die Kontrolle übernimmt.
