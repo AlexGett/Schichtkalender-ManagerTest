@@ -102,79 +102,90 @@
             <button class="close-button" id="closeSettingsDialog">&times;</button>
             <h3>Einstellungen</h3>
 
-            <div class="settings-option">
-                <label for="toggleAnimations">Pulsieren ausschalten:</label>
-                <input type="checkbox" id="toggleAnimations">
-            </div>
-            <div class="settings-option">
-                <label for="toggleScrollToToday">Beim Start zu Heute scrollen:</label>
-                <input type="checkbox" id="toggleScrollToToday">
-            </div>
-            <div class="settings-option">
-                <label for="borderColorPicker">Randfarbe wählen:</label>
-                <input type="color" id="borderColorPicker" value="#0161FD">
-            </div>
-            <div class="settings-option">
-                <label for="toggleAutoDarkMode">Automatischer Dark Mode:</label>
-                <input type="checkbox" id="toggleAutoDarkMode">
-            </div>
-            <div class="settings-option">
-                <label for="toggleDarkMode">Dark Mode aktivieren:</label>
-                <input type="checkbox" id="toggleDarkMode">
+            <!-- TABS NAVIGATION -->
+            <div class="settings-tabs">
+                <button class="settings-tab active" data-tab="general"><i class="fas fa-sliders-h"></i> <span class="tab-label">Allgemein</span></button>
+                <button class="settings-tab" data-tab="profile"><i class="fas fa-user"></i> <span class="tab-label">Profil</span></button>
+                <button class="settings-tab" data-tab="shifts"><i class="fas fa-calendar-alt"></i> <span class="tab-label">Schicht</span></button>
+                <button class="settings-tab" data-tab="data"><i class="fas fa-database"></i> <span class="tab-label">Daten</span></button>
             </div>
 
-            <hr>
-
-            <div class="settings-section">
-                <h4 id="settingsHeaderProfile">Profileinstellungen</h4>
+            <!-- TAB 1: ALLGEMEIN -->
+            <div id="tab-general" class="tab-content active">
+                <!-- Sprachauswahl wird hier per JS eingefügt -->
                 <div class="settings-option">
-                    <label for="profileVornameInput">Vorname:</label>
-                    <input type="text" id="profileVornameInput" placeholder="Ihr Vorname">
+                    <label for="toggleAnimations">Pulsieren ausschalten:</label>
+                    <input type="checkbox" id="toggleAnimations">
                 </div>
                 <div class="settings-option">
-                    <label for="profileNachnameInput">Nachname:</label>
-                    <input type="text" id="profileNachnameInput" placeholder="Ihr Nachname">
+                    <label for="toggleScrollToToday">Beim Start zu Heute scrollen:</label>
+                    <input type="checkbox" id="toggleScrollToToday">
                 </div>
                 <div class="settings-option">
-                    <label for="profilePersonalNummer">Personalnummer:</label>
-                    <input type="text" id="profilePersonalNummer" placeholder="z.B. 12345">
+                    <label for="borderColorPicker">Randfarbe wählen:</label>
+                    <input type="color" id="borderColorPicker" value="#0161FD">
                 </div>
                 <div class="settings-option">
-                    <label>Schichtzeiten (Start - Ende):</label>
-                    <div class="shift-time-row">
-                        <span>Früh:</span>
-                        <input type="time" id="profileFruehStart" aria-label="Startzeit Frühschicht">
-                        <input type="time" id="profileFruehEnd" aria-label="Endzeit Frühschicht">
-                    </div>
-                    <div class="shift-time-row">
-                        <span>Spät:</span>
-                        <input type="time" id="profileSpaetStart" aria-label="Startzeit Spätschicht">
-                        <input type="time" id="profileSpaetEnd" aria-label="Endzeit Spätschicht">
-                    </div>
-                    <div class="shift-time-row">
-                        <span>Nacht:</span>
-                        <input type="time" id="profileNachtStart" aria-label="Startzeit Nachtschicht">
-                        <input type="time" id="profileNachtEnd" aria-label="Endzeit Nachtschicht">
-                    </div>
+                    <label for="toggleAutoDarkMode">Automatischer Dark Mode:</label>
+                    <input type="checkbox" id="toggleAutoDarkMode">
                 </div>
                 <div class="settings-option">
-                    <label>Unterschrift zeichnen:</label>
-                    <div class="signature-container">
-                        <canvas id="signatureCanvas" width="300" height="120" class="signature-canvas"></canvas>
-                    </div>
-                    <div class="signature-buttons">
-                        <button id="clearSignatureButton" class="confirm-button btn-red">Löschen</button>
-                        <button id="resetSignatureButton" class="confirm-button btn-grey">Zurücksetzen</button>
-                    </div>
+                    <label for="toggleDarkMode">Dark Mode aktivieren:</label>
+                    <input type="checkbox" id="toggleDarkMode">
                 </div>
-                <button id="saveProfileButton" class="confirm-button">Profil speichern</button>
             </div>
 
-            <hr>
+            <!-- TAB 2: PROFIL -->
+            <div id="tab-profile" class="tab-content">
+                <div class="settings-section">
+                    <h4 id="settingsHeaderProfile">Profileinstellungen</h4>
+                    <div class="settings-option">
+                        <label for="profileVornameInput">Vorname:</label>
+                        <input type="text" id="profileVornameInput" placeholder="Ihr Vorname">
+                    </div>
+                    <div class="settings-option">
+                        <label for="profileNachnameInput">Nachname:</label>
+                        <input type="text" id="profileNachnameInput" placeholder="Ihr Nachname">
+                    </div>
+                    <div class="settings-option">
+                        <label for="profilePersonalNummer">Personalnummer:</label>
+                        <input type="text" id="profilePersonalNummer" placeholder="z.B. 12345">
+                    </div>
+                    <div class="settings-option">
+                        <label>Schichtzeiten (Start - Ende):</label>
+                        <div class="shift-time-row">
+                            <span>Früh:</span>
+                            <input type="time" id="profileFruehStart" aria-label="Startzeit Frühschicht">
+                            <input type="time" id="profileFruehEnd" aria-label="Endzeit Frühschicht">
+                        </div>
+                        <div class="shift-time-row">
+                            <span>Spät:</span>
+                            <input type="time" id="profileSpaetStart" aria-label="Startzeit Spätschicht">
+                            <input type="time" id="profileSpaetEnd" aria-label="Endzeit Spätschicht">
+                        </div>
+                        <div class="shift-time-row">
+                            <span>Nacht:</span>
+                            <input type="time" id="profileNachtStart" aria-label="Startzeit Nachtschicht">
+                            <input type="time" id="profileNachtEnd" aria-label="Endzeit Nachtschicht">
+                        </div>
+                    </div>
+                    <div class="settings-option">
+                        <label>Unterschrift zeichnen:</label>
+                        <div class="signature-container">
+                            <canvas id="signatureCanvas" width="300" height="120" class="signature-canvas"></canvas>
+                        </div>
+                        <div class="signature-buttons">
+                            <button id="clearSignatureButton" class="confirm-button btn-red">Löschen</button>
+                            <button id="resetSignatureButton" class="confirm-button btn-grey">Zurücksetzen</button>
+                        </div>
+                    </div>
+                    <button id="saveProfileButton" class="confirm-button">Profil speichern</button>
+                </div>
+            </div>
 
-            <div class="settings-section">
-                <button id="openCustomShiftSystemSettings" class="action-button">Eigenes Schichtsystem festlegen</button>
-                <div id="customShiftSystemSection">
+            <!-- TAB 3: SCHICHTSYSTEM -->
+            <div id="tab-shifts" class="tab-content">
+                <div class="settings-section" id="customShiftSystemSection" style="display: block;">
                     <h4 id="settingsHeaderCustomShift">Schichtsystem-Details</h4>
                     <p class="small-text">Hier kannst du dein eigenes Schichtsystem definieren. Trenne die Schichttypen mit Kommas (z.B. F,F,F,N,N,Frei).</p>
                     <div class="settings-option">
@@ -197,16 +208,20 @@
                     </div>
                 </div>
             </div>
-            <div class="settings-section">
-                <h4 id="settingsHeaderBackup">Backup & Wiederherstellung</h4>
-                <p class="backup-intro">Bei einem Handywechsel kann der aktuelle Kalender gesichert werden:</p>
-                <ol class="backup-steps">
-                    <li>Auf dem alten Handy ein Backup erstellen</li>
-                    <li>Die Datei teilen (z.B. über WhatsApp)</li>
-                    <li>Auf dem neuen Handy das Backup laden</li>
-                </ol>
-                <button class="action-button" id="backupSettingsButton">Backup erstellen</button>
-                <button class="action-button" id="restoreSettingsButton">Backup laden</button>
+
+            <!-- TAB 4: DATEN -->
+            <div id="tab-data" class="tab-content">
+                <div class="settings-section">
+                    <h4 id="settingsHeaderBackup">Backup & Wiederherstellung</h4>
+                    <p class="backup-intro">Bei einem Handywechsel kann der aktuelle Kalender gesichert werden:</p>
+                    <ol class="backup-steps">
+                        <li>Auf dem alten Handy ein Backup erstellen</li>
+                        <li>Die Datei teilen (z.B. über WhatsApp)</li>
+                        <li>Auf dem neuen Handy das Backup laden</li>
+                    </ol>
+                    <button class="action-button" id="backupSettingsButton">Backup erstellen</button>
+                    <button class="action-button" id="restoreSettingsButton">Backup laden</button>
+                </div>
             </div>
             <div id="versionDisplay" class="small-text" style="margin-top: 20px;"></div>
         </div>

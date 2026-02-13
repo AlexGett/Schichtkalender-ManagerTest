@@ -94,7 +94,13 @@ const uiTranslations = {
             apply: 'Übernehmen',
             guest: 'Gast',
             idLabel: 'ID',
-            version: 'Version'
+            version: 'Version',
+            tabs: {
+                general: 'Allgemein',
+                profile: 'Profil',
+                shifts: 'Schichtsystem',
+                data: 'Daten'
+            }
         },
         vacation: {
             title: 'Urlaubsantrag',
@@ -313,7 +319,13 @@ const uiTranslations = {
             apply: 'Apply',
             guest: 'Guest',
             idLabel: 'ID',
-            version: 'Version'
+            version: 'Version',
+            tabs: {
+                general: 'General',
+                profile: 'Profile',
+                shifts: 'Shift System',
+                data: 'Data'
+            }
         },
         vacation: {
             title: 'Vacation Request',
@@ -529,7 +541,13 @@ const uiTranslations = {
             apply: 'Применить',
             guest: 'Гость',
             idLabel: 'ID',
-            version: 'Версия'
+            version: 'Версия',
+            tabs: {
+                general: 'Общие',
+                profile: 'Профиль',
+                shifts: 'Смены',
+                data: 'Данные'
+            }
         },
         vacation: {
             title: 'Заявление на отпуск',
@@ -745,7 +763,13 @@ const uiTranslations = {
             apply: 'Uygula',
             guest: 'Misafir',
             idLabel: 'ID',
-            version: 'Sürüm'
+            version: 'Sürüm',
+            tabs: {
+                general: 'Genel',
+                profile: 'Profil',
+                shifts: 'Vardiya',
+                data: 'Veri'
+            }
         },
         vacation: {
             title: 'İzin İsteği',
@@ -961,7 +985,13 @@ const uiTranslations = {
             apply: 'Apliko',
             guest: 'Mysafir',
             idLabel: 'ID',
-            version: 'Versioni'
+            version: 'Versioni',
+            tabs: {
+                general: 'Të përgjithshme',
+                profile: 'Profili',
+                shifts: 'Ndërrimi',
+                data: 'Të dhëna'
+            }
         },
         vacation: {
             title: 'Kërkesë për pushim',
@@ -1177,7 +1207,13 @@ const uiTranslations = {
             apply: 'تطبيق',
             guest: 'ضيف',
             idLabel: 'هوية',
-            version: 'الإصدار'
+            version: 'الإصدار',
+            tabs: {
+                general: 'عام',
+                profile: 'الملف الشخصي',
+                shifts: 'الورديات',
+                data: 'البيانات'
+            }
         },
         vacation: {
             title: 'طلب إجازة',
@@ -1393,7 +1429,13 @@ const uiTranslations = {
             apply: 'Primijeni',
             guest: 'Gost',
             idLabel: 'ID',
-            version: 'Verzija'
+            version: 'Verzija',
+            tabs: {
+                general: 'Općenito',
+                profile: 'Profil',
+                shifts: 'Smjene',
+                data: 'Podaci'
+            }
         },
         vacation: {
             title: 'Zahtjev za godišnji',
@@ -1609,7 +1651,13 @@ const uiTranslations = {
             apply: 'Použiť',
             guest: 'Hosť',
             idLabel: 'ID',
-            version: 'Verzia'
+            version: 'Verzia',
+            tabs: {
+                general: 'Všeobecné',
+                profile: 'Profil',
+                shifts: 'Zmeny',
+                data: 'Dáta'
+            }
         },
         vacation: {
             title: 'Žiadosť o dovolenku',

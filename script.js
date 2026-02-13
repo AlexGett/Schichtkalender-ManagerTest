@@ -147,12 +147,9 @@ function injectLanguageSelector() {
         </div>
     `;
 
-    const title = settingsDialog.querySelector('h3');
-    if (title && title.nextSibling) {
-        settingsDialog.insertBefore(container, title.nextSibling);
-    } else {
-        settingsDialog.appendChild(container);
-    }
+    // NEU: In den "Allgemein" Tab einfügen
+    const generalTab = document.getElementById('tab-general');
+    if (generalTab) generalTab.insertBefore(container, generalTab.firstChild);
 
     const select = document.getElementById('languageSelect');
     select.value = currentLanguage;
@@ -205,17 +202,21 @@ function applyLanguageToUI() {
         setLabel('profileAbteilung', t.settings.department);
         setLabel('profileCountWeekends', t.settings.countWeekends);
 
+        // Tabs übersetzen
+        const tabLabels = document.querySelectorAll('.settings-tab .tab-label');
+        if (tabLabels.length >= 4 && t.settings.tabs) {
+            tabLabels[0].textContent = t.settings.tabs.general;
+            tabLabels[1].textContent = t.settings.tabs.profile;
+            tabLabels[2].textContent = t.settings.tabs.shifts;
+            tabLabels[3].textContent = t.settings.tabs.data;
+        }
+
         setPlaceholder('profileVornameInput', t.settings.firstNamePlaceholder);
         setPlaceholder('profileNachnameInput', t.settings.lastNamePlaceholder);
         setPlaceholder('profilePersonalNummer', t.settings.personIdPlaceholder);
         setPlaceholder('profileAbteilung', t.settings.departmentPlaceholder);
         
         // Buttons
-        const btnCustomShift = document.getElementById('openCustomShiftSystemSettings');
-        if (btnCustomShift) {
-            const isHidden = document.getElementById('customShiftSystemSection').style.display === 'none';
-            btnCustomShift.textContent = isHidden ? t.settings.customShift : t.settings.customShiftClose;
-        }
         
         const btnSaveShift = document.getElementById('saveCustomShiftSystem');
         if (btnSaveShift) btnSaveShift.textContent = t.settings.saveShift;
@@ -978,24 +979,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		btnGroupB.addEventListener('click', () => setShiftGroup('B'));
 	}
 
-	// NEUE FUNKTIONALITÄT FÜR DAS ÖFFNEN/SCHLIESSEN DES SCHICHTSYSTEM-BEREICHS MIT PASSWORT
-	const openCustomShiftSystemButton = document.getElementById('openCustomShiftSystemSettings');
-	const customShiftSystemSection = document.getElementById('customShiftSystemSection');
-
-	if (openCustomShiftSystemButton && customShiftSystemSection) {
-		openCustomShiftSystemButton.addEventListener('click', () => {
-            const isHidden = customShiftSystemSection.style.display === 'none' || getComputedStyle(customShiftSystemSection).display === 'none';
-			if (isHidden) {
-				// Passworteingabe und -prüfung wurden entfernt
-				customShiftSystemSection.style.display = 'block';
-				openCustomShiftSystemButton.textContent = 'Eigenes Schichtsystem schließen';
-			} else {
-				customShiftSystemSection.style.display = 'none';
-				openCustomShiftSystemButton.textContent = 'Eigenes Schichtsystem festlegen';
-			}
-		});
-	}
-
 	// Event Listener für Backup und Restore
 	const backupButton = document.getElementById('backupSettingsButton');
 	const restoreButton = document.getElementById('restoreSettingsButton');
@@ -1074,6 +1057,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     injectModelSelector(); // NEU: Modell-Auswahl in Einstellungen einfügen
 
+    // TABS INITIALISIERUNG
+    const tabs = document.querySelectorAll('.settings-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.dataset.tab;
+            switchSettingsTab(target);
+        });
+    });
+
 	registerServiceWorker(); // Service Worker mit Update-Funktion registrieren
 	createBottomAppDock(); // NEU: Untere App-Leiste erstellen und Elemente verschieben
 
@@ -1091,6 +1083,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800); // Kurze Verzögerung für Rendering
     }
 });
+
+// NEU: Funktion zum Wechseln der Tabs
+function switchSettingsTab(tabName) {
+    document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+    const activeTab = document.querySelector(`.settings-tab[data-tab="${tabName}"]`);
+    const activeContent = document.getElementById(`tab-${tabName}`);
+
+    if (activeTab) activeTab.classList.add('active');
+    if (activeContent) activeContent.classList.add('active');
+}
 
 // --- FUNKTIONEN FÜR BENUTZERDEFINIERTES SCHICHTSYSTEM ---
 function injectCustomShiftButtons() {
@@ -1904,13 +1908,6 @@ function collapseAllSettingsSections() {
         }
     });
 
-    // NEU: Auch den Bereich "Eigenes Schichtsystem" zuklappen
-    const customShiftSystemSection = document.getElementById('customShiftSystemSection');
-    const openCustomShiftSystemButton = document.getElementById('openCustomShiftSystemSettings');
-    if (customShiftSystemSection && openCustomShiftSystemButton) {
-        customShiftSystemSection.style.display = 'none';
-        openCustomShiftSystemButton.textContent = uiTranslations[currentLanguage].settings.customShift;
-    }
 
     // NEU: Profil-Details zuklappen
     const profileDetailsWrapper = document.getElementById('profileDetailsWrapper');
@@ -4119,72 +4116,12 @@ if (exportUrlaubsantragButton) {
 
 // Funktion zum Umschalten der Sichtbarkeit im Einstellungsdialog
 function toggleSettingsVisibility(mode) {
-	const dialog = document.querySelector('#settingsDialogOverlay .dialog');
-	if (!dialog) return;
-
-	const profileInput = document.getElementById('profileVornameInput');
-	const profileSection = profileInput ? profileInput.closest('.settings-section') : null;
-	const saveBtn = document.getElementById('saveProfileButton');
-
-	Array.from(dialog.children).forEach(child => {
-		// Titel und Schließen-Button immer anzeigen
-		if (child.tagName === 'H3' || child.classList.contains('close-button')) return;
-
-		const isProfileSection = profileSection && (child === profileSection);
-		const containsSaveBtn = saveBtn && (child === saveBtn || child.contains(saveBtn));
-
-		if (mode === 'profile') {
-			if (isProfileSection) {
-				child.style.display = '';
-			} else if (containsSaveBtn) {
-				child.style.display = '';
-				// Falls der Button in einer Gruppe ist, andere Buttons ausblenden
-				if (saveBtn.parentElement.classList.contains('button-group')) {
-					Array.from(saveBtn.parentElement.children).forEach(btn => {
-						if (btn !== saveBtn) btn.style.display = 'none';
-						else btn.style.display = '';
-					});
-				}
-			} else {
-				child.style.display = 'none';
-			}
-		} else { // general
-			if (isProfileSection) {
-				child.style.display = 'none';
-			} else if (containsSaveBtn) {
-				// Falls Button in Gruppe, Gruppe zeigen aber Button ausblenden
-				if (saveBtn.parentElement.classList.contains('button-group')) {
-					child.style.display = '';
-					saveBtn.style.display = 'none';
-					Array.from(saveBtn.parentElement.children).forEach(btn => {
-						if (btn !== saveBtn) btn.style.display = '';
-					});
-				} else {
-					child.style.display = 'none';
-				}
-			} else {
-				// Alles andere anzeigen (außer customShiftSystemSection, das seinen eigenen Status hat)
-				if (child.id !== 'customShiftSystemSection') {
-					child.style.display = '';
-				} else {
-					// Inline-Style entfernen, damit CSS-Klasse greift (standardmäßig ausgeblendet)
-					child.style.display = '';
-				}
-			}
-		}
-	});
-
-	// Profil-Sektion aufklappen im Profil-Modus - DEAKTIVIERT, da jetzt manuell gesteuert
-	/*
-	if (mode === 'profile' && profileSection) {
-		const contentWrapper = profileSection.lastElementChild;
-		if (contentWrapper && contentWrapper.tagName === 'DIV') {
-			contentWrapper.style.display = 'block';
-			const icon = profileSection.querySelector('h4 i');
-			if (icon) icon.className = 'fas fa-chevron-up';
-		}
-	}
-	*/
+    // Vereinfachte Logik: Einfach den entsprechenden Tab öffnen
+    if (mode === 'profile') {
+        switchSettingsTab('profile');
+    } else {
+        switchSettingsTab('general');
+    }
 }
 
 // Profil beim Laden der Seite laden
