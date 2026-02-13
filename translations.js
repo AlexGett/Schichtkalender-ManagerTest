@@ -65,9 +65,6 @@ const uiTranslations = {
             selectModel: 'Schichtmodell Vorlage wählen:',
             selectGroup: 'Gruppe / Versatz (Tage):',
             applyModel: 'Vorlage anwenden',
-            selectModel: 'Schichtmodell Vorlage wählen:',
-            selectGroup: 'Gruppe / Versatz (Tage):',
-            applyModel: 'Vorlage anwenden',
             profile: 'Profil',
             firstName: 'Vorname',
             firstNamePlaceholder: 'Ihr Vorname',
@@ -95,6 +92,7 @@ const uiTranslations = {
             guest: 'Gast',
             idLabel: 'ID',
             version: 'Version',
+            allRightsReserved: 'Alle Rechte vorbehalten.',
             tabs: {
                 general: 'Allgemein',
                 profile: 'Profil',
@@ -118,6 +116,21 @@ const uiTranslations = {
             remarkPlaceholder: 'Zusätzliche Zeile...',
             generatePdf: 'PDF generieren',
             print: 'PDF drucken',
+            actions: {
+                submit: '📤 Beantragen (Speichern & Export)',
+                pdf: '📄 PDF Generieren',
+                print: '🖨️ PDF Drucken',
+                execute: 'Ausführen'
+            },
+            status: {
+                approved: '🟢 Genehmigt',
+                rejected: '🔴 Abgelehnt',
+                requested: '🟡 Beantragt',
+                reason: 'Grund',
+                unknown: 'Unbekannt'
+            },
+            viewPdf: '📄 PDF ansehen',
+            importManager: '📥 Manager-Antwort importieren',
             types: {
                 1: '1. Tarifurlaub',
                 2: '2. Abbau Zeitkonto',
@@ -226,7 +239,14 @@ const uiTranslations = {
             vacationDeleted: 'Urlaubseintrag gelöscht.',
             deleteEntryConfirm: 'Möchtest du diesen Eintrag wirklich löschen?',
             colorsSaved: 'Farben erfolgreich übernommen!',
-            enterText: 'Bitte Text eingeben'
+            enterText: 'Bitte Text eingeben',
+            vacationRestored: 'Urlaub wurde wiederhergestellt und aktualisiert.',
+            requestExported: 'Antrag gespeichert und Datei für Manager erstellt!',
+            statusUpdated: 'Status aktualisiert: {0}',
+            noRequestFound: 'Kein passender Urlaubsantrag gefunden.',
+            importError: 'Fehler beim Importieren der Antwort.',
+            generalError: 'Ein Fehler ist aufgetreten.',
+            languageChanged: 'Sprache geändert!'
         },
         shiftButtons: {
             early: 'F',
@@ -290,9 +310,6 @@ const uiTranslations = {
             selectModel: 'Select Shift Model Template:',
             selectGroup: 'Group / Offset (Days):',
             applyModel: 'Apply Template',
-            selectModel: 'Select Shift Model Template:',
-            selectGroup: 'Group / Offset (Days):',
-            applyModel: 'Apply Template',
             profile: 'Profile',
             firstName: 'First Name',
             firstNamePlaceholder: 'Your First Name',
@@ -320,6 +337,7 @@ const uiTranslations = {
             guest: 'Guest',
             idLabel: 'ID',
             version: 'Version',
+            allRightsReserved: 'All rights reserved.',
             tabs: {
                 general: 'General',
                 profile: 'Profile',
@@ -343,6 +361,21 @@ const uiTranslations = {
             remarkPlaceholder: 'Additional line...',
             generatePdf: 'Generate PDF',
             print: 'Print PDF',
+            actions: {
+                submit: '📤 Submit (Save & Export)',
+                pdf: '📄 Generate PDF',
+                print: '🖨️ Print PDF',
+                execute: 'Execute'
+            },
+            status: {
+                approved: '🟢 Approved',
+                rejected: '🔴 Rejected',
+                requested: '🟡 Requested',
+                reason: 'Reason',
+                unknown: 'Unknown'
+            },
+            viewPdf: '📄 View PDF',
+            importManager: '📥 Import Manager Response',
             types: {
                 1: '1. Tariff Vacation',
                 2: '2. Reduce Time Account',
@@ -451,7 +484,14 @@ const uiTranslations = {
             vacationDeleted: 'Vacation entry deleted.',
             deleteEntryConfirm: 'Do you really want to delete this entry?',
             colorsSaved: 'Colors applied successfully!',
-            enterText: 'Please enter text'
+            enterText: 'Please enter text',
+            vacationRestored: 'Vacation restored and updated.',
+            requestExported: 'Request saved and file for manager created!',
+            statusUpdated: 'Status updated: {0}',
+            noRequestFound: 'No matching vacation request found.',
+            importError: 'Error importing response.',
+            generalError: 'An error occurred.',
+            languageChanged: 'Language changed!'
         },
         shiftButtons: {
             early: 'E',
@@ -542,6 +582,7 @@ const uiTranslations = {
             guest: 'Гость',
             idLabel: 'ID',
             version: 'Версия',
+            allRightsReserved: 'Все права защищены.',
             tabs: {
                 general: 'Общие',
                 profile: 'Профиль',
@@ -565,6 +606,21 @@ const uiTranslations = {
             remarkPlaceholder: 'Дополнительная строка...',
             generatePdf: 'Создать PDF',
             print: 'Печать PDF',
+            actions: {
+                submit: '📤 Отправить (Сохр. & Экспорт)',
+                pdf: '📄 Создать PDF',
+                print: '🖨️ Печать PDF',
+                execute: 'Выполнить'
+            },
+            status: {
+                approved: '🟢 Одобрено',
+                rejected: '🔴 Отклонено',
+                requested: '🟡 Запрошено',
+                reason: 'Причина',
+                unknown: 'Неизвестно'
+            },
+            viewPdf: '📄 Смотреть PDF',
+            importManager: '📥 Импорт ответа менеджера',
             types: {
                 1: '1. Тарифный отпуск',
                 2: '2. Сокращение счета времени',
@@ -673,7 +729,14 @@ const uiTranslations = {
             vacationDeleted: 'Запись об отпуске удалена.',
             deleteEntryConfirm: 'Вы действительно хотите удалить эту запись?',
             colorsSaved: 'Цвета успешно применены!',
-            enterText: 'Пожалуйста, введите текст'
+            enterText: 'Пожалуйста, введите текст',
+            vacationRestored: 'Отпуск восстановлен и обновлен.',
+            requestExported: 'Запрос сохранен и файл для менеджера создан!',
+            statusUpdated: 'Статус обновлен: {0}',
+            noRequestFound: 'Подходящий запрос на отпуск не найден.',
+            importError: 'Ошибка при импорте ответа.',
+            generalError: 'Произошла ошибка.',
+            languageChanged: 'Язык изменен!'
         },
         shiftButtons: {
             early: 'У',
@@ -764,6 +827,7 @@ const uiTranslations = {
             guest: 'Misafir',
             idLabel: 'ID',
             version: 'Sürüm',
+            allRightsReserved: 'Tüm hakları saklıdır.',
             tabs: {
                 general: 'Genel',
                 profile: 'Profil',
@@ -787,6 +851,21 @@ const uiTranslations = {
             remarkPlaceholder: 'Ek satır...',
             generatePdf: 'PDF Oluştur',
             print: 'PDF Yazdır',
+            actions: {
+                submit: '📤 Gönder (Kaydet & Dışa Aktar)',
+                pdf: '📄 PDF Oluştur',
+                print: '🖨️ PDF Yazdır',
+                execute: 'Çalıştır'
+            },
+            status: {
+                approved: '🟢 Onaylandı',
+                rejected: '🔴 Reddedildi',
+                requested: '🟡 Talep Edildi',
+                reason: 'Sebep',
+                unknown: 'Bilinmiyor'
+            },
+            viewPdf: '📄 PDF Görüntüle',
+            importManager: '📥 Yönetici Yanıtını İçe Aktar',
             types: {
                 1: '1. Tarife İzni',
                 2: '2. Zaman Hesabı Azaltma',
@@ -895,7 +974,14 @@ const uiTranslations = {
             vacationDeleted: 'İzin kaydı silindi.',
             deleteEntryConfirm: 'Bu kaydı silmek istediğinize emin misiniz?',
             colorsSaved: 'Renkler başarıyla uygulandı!',
-            enterText: 'Lütfen metin girin'
+            enterText: 'Lütfen metin girin',
+            vacationRestored: 'İzin geri yüklendi ve güncellendi.',
+            requestExported: 'İstek kaydedildi ve yönetici için dosya oluşturuldu!',
+            statusUpdated: 'Durum güncellendi: {0}',
+            noRequestFound: 'Uygun izin isteği bulunamadı.',
+            importError: 'Yanıt içe aktarılırken hata oluştu.',
+            generalError: 'Bir hata oluştu.',
+            languageChanged: 'Dil değiştirildi!'
         },
         shiftButtons: {
             early: 'S',
@@ -986,6 +1072,7 @@ const uiTranslations = {
             guest: 'Mysafir',
             idLabel: 'ID',
             version: 'Versioni',
+            allRightsReserved: 'Të gjitha të drejtat e rezervuara.',
             tabs: {
                 general: 'Të përgjithshme',
                 profile: 'Profili',
@@ -1009,6 +1096,21 @@ const uiTranslations = {
             remarkPlaceholder: 'Rresht shtesë...',
             generatePdf: 'Gjenero PDF',
             print: 'Printo PDF',
+            actions: {
+                submit: '📤 Dorëzo (Ruaj & Eksporto)',
+                pdf: '📄 Gjenero PDF',
+                print: '🖨️ Printo PDF',
+                execute: 'Ekzekuto'
+            },
+            status: {
+                approved: '🟢 Miratuar',
+                rejected: '🔴 Refuzuar',
+                requested: '🟡 Kërkuar',
+                reason: 'Arsyeja',
+                unknown: 'E panjohur'
+            },
+            viewPdf: '📄 Shiko PDF',
+            importManager: '📥 Importo Përgjigjen e Menaxherit',
             types: {
                 1: '1. Pushim tarifor',
                 2: '2. Ulje e llogarisë së kohës',
@@ -1117,7 +1219,14 @@ const uiTranslations = {
             vacationDeleted: 'Hyrja e pushimit u fshi.',
             deleteEntryConfirm: 'A dëshironi vërtet ta fshini këtë hyrje?',
             colorsSaved: 'Ngjyrat u aplikuan me sukses!',
-            enterText: 'Ju lutemi futni tekst'
+            enterText: 'Ju lutemi futni tekst',
+            vacationRestored: 'Pushimi u rivendos dhe u përditësua.',
+            requestExported: 'Kërkesa u ruajt dhe skedari për menaxherin u krijua!',
+            statusUpdated: 'Statusi u përditësua: {0}',
+            noRequestFound: 'Nuk u gjet asnjë kërkesë për pushim.',
+            importError: 'Gabim gjatë importimit të përgjigjes.',
+            generalError: 'Ndodhi një gabim.',
+            languageChanged: 'Gjuha u ndryshua!'
         },
         shiftButtons: {
             early: 'M',
@@ -1208,6 +1317,7 @@ const uiTranslations = {
             guest: 'ضيف',
             idLabel: 'هوية',
             version: 'الإصدار',
+            allRightsReserved: 'جميع الحقوق محفوظة.',
             tabs: {
                 general: 'عام',
                 profile: 'الملف الشخصي',
@@ -1231,6 +1341,21 @@ const uiTranslations = {
             remarkPlaceholder: 'سطر إضافي...',
             generatePdf: 'إنشاء PDF',
             print: 'طباعة PDF',
+            actions: {
+                submit: '📤 تقديم (حفظ وتصدير)',
+                pdf: '📄 إنشاء PDF',
+                print: '🖨️ طباعة PDF',
+                execute: 'تنفيذ'
+            },
+            status: {
+                approved: '🟢 مقبول',
+                rejected: '🔴 مرفوض',
+                requested: '🟡 مطلوب',
+                reason: 'السبب',
+                unknown: 'مجهول'
+            },
+            viewPdf: '📄 عرض PDF',
+            importManager: '📥 استيراد رد المدير',
             types: {
                 1: '1. إجازة تعريفية',
                 2: '2. تقليل حساب الوقت',
@@ -1339,7 +1464,14 @@ const uiTranslations = {
             vacationDeleted: 'تم حذف إدخال الإجازة.',
             deleteEntryConfirm: 'هل تريد حقًا حذف هذا الإدخال؟',
             colorsSaved: 'تم تطبيق الألوان بنجاح!',
-            enterText: 'يرجى إدخال نص'
+            enterText: 'يرجى إدخال نص',
+            vacationRestored: 'تم استعادة الإجازة وتحديثها.',
+            requestExported: 'تم حفظ الطلب وإنشاء ملف للمدير!',
+            statusUpdated: 'تم تحديث الحالة: {0}',
+            noRequestFound: 'لم يتم العثور على طلب إجازة مطابق.',
+            importError: 'خطأ في استيراد الرد.',
+            generalError: 'حدث خطأ.',
+            languageChanged: 'تم تغيير اللغة!'
         },
         shiftButtons: {
             early: 'ص',
@@ -1430,6 +1562,7 @@ const uiTranslations = {
             guest: 'Gost',
             idLabel: 'ID',
             version: 'Verzija',
+            allRightsReserved: 'Sva prava pridržana.',
             tabs: {
                 general: 'Općenito',
                 profile: 'Profil',
@@ -1453,6 +1586,21 @@ const uiTranslations = {
             remarkPlaceholder: 'Dodatni redak...',
             generatePdf: 'Generiraj PDF',
             print: 'Ispiši PDF',
+            actions: {
+                submit: '📤 Podnesi (Spremi & Izvezi)',
+                pdf: '📄 Generiraj PDF',
+                print: '🖨️ Ispiši PDF',
+                execute: 'Izvrši'
+            },
+            status: {
+                approved: '🟢 Odobreno',
+                rejected: '🔴 Odbijeno',
+                requested: '🟡 Zatraženo',
+                reason: 'Razlog',
+                unknown: 'Nepoznato'
+            },
+            viewPdf: '📄 Pogledaj PDF',
+            importManager: '📥 Uvezi odgovor voditelja',
             types: {
                 1: '1. Tarifni godišnji',
                 2: '2. Smanjenje sati',
@@ -1561,7 +1709,14 @@ const uiTranslations = {
             vacationDeleted: 'Unos godišnjeg obrisan.',
             deleteEntryConfirm: 'Želite li stvarno obrisati ovaj unos?',
             colorsSaved: 'Boje uspješno primijenjene!',
-            enterText: 'Molimo unesite tekst'
+            enterText: 'Molimo unesite tekst',
+            vacationRestored: 'Godišnji je vraćen i ažuriran.',
+            requestExported: 'Zahtjev spremljen i datoteka za voditelja stvorena!',
+            statusUpdated: 'Status ažuriran: {0}',
+            noRequestFound: 'Nije pronađen odgovarajući zahtjev za godišnji.',
+            importError: 'Greška pri uvozu odgovora.',
+            generalError: 'Došlo je do greške.',
+            languageChanged: 'Jezik promijenjen!'
         },
         shiftButtons: {
             early: 'J',
@@ -1652,6 +1807,7 @@ const uiTranslations = {
             guest: 'Hosť',
             idLabel: 'ID',
             version: 'Verzia',
+            allRightsReserved: 'Všetky práva vyhradené.',
             tabs: {
                 general: 'Všeobecné',
                 profile: 'Profil',
@@ -1675,6 +1831,21 @@ const uiTranslations = {
             remarkPlaceholder: 'Dodatočný riadok...',
             generatePdf: 'Generovať PDF',
             print: 'Tlačiť PDF',
+            actions: {
+                submit: '📤 Odoslať (Uložiť & Export)',
+                pdf: '📄 Generovať PDF',
+                print: '🖨️ Tlačiť PDF',
+                execute: 'Vykonať'
+            },
+            status: {
+                approved: '🟢 Schválené',
+                rejected: '🔴 Zamietnuté',
+                requested: '🟡 Požiadané',
+                reason: 'Dôvod',
+                unknown: 'Neznáme'
+            },
+            viewPdf: '📄 Zobraziť PDF',
+            importManager: '📥 Importovať odpoveď manažéra',
             types: {
                 1: '1. Tarifná dovolenka',
                 2: '2. Zníženie časového konta',
@@ -1783,7 +1954,14 @@ const uiTranslations = {
             vacationDeleted: 'Záznam o dovolenke vymazaný.',
             deleteEntryConfirm: 'Naozaj chcete vymazať tento záznam?',
             colorsSaved: 'Farby úspešne použité!',
-            enterText: 'Prosím zadajte text'
+            enterText: 'Prosím zadajte text',
+            vacationRestored: 'Dovolenka bola obnovená a aktualizovaná.',
+            requestExported: 'Žiadosť uložená a súbor pre manažéra vytvorený!',
+            statusUpdated: 'Stav aktualizovaný: {0}',
+            noRequestFound: 'Nenašla sa žiadna zodpovedajúca žiadosť o dovolenku.',
+            importError: 'Chyba pri importe odpovede.',
+            generalError: 'Vyskytla sa chyba.',
+            languageChanged: 'Jazyk zmenený!'
         },
         shiftButtons: {
             early: 'R',

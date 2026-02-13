@@ -167,8 +167,31 @@ function injectLanguageSelector() {
         
         applyLanguageToUI(); // NEU: UI-Texte aktualisieren
         loadProfile(); // NEU: Profil-UI aktualisieren (Summary Card)
-        showToast('Sprache geändert / Language changed', 'success');
+        showToast(uiTranslations[currentLanguage].prompts.languageChanged, 'success');
     });
+}
+
+// NEU: Copyright in Einstellungen einfügen
+function injectCopyright() {
+    const settingsDialog = document.querySelector('#settingsDialogOverlay .dialog');
+    if (settingsDialog && !document.getElementById('appCopyright')) {
+        const copyright = document.createElement('div');
+        copyright.id = 'appCopyright';
+        copyright.style.textAlign = 'center';
+        copyright.style.fontSize = '0.85em';
+        copyright.style.color = '#6c757d';
+        copyright.style.marginTop = '25px';
+        copyright.style.paddingTop = '15px';
+        copyright.style.borderTop = '1px solid #dee2e6';
+        
+        const currentYear = new Date().getFullYear();
+        copyright.innerHTML = `
+            <div style="font-weight: 600; margin-bottom: 4px;">&copy; ${currentYear} Alexander Gettinger</div>
+            <div style="font-size: 0.9em;">${uiTranslations[currentLanguage].settings.allRightsReserved}</div>
+        `;
+        
+        settingsDialog.appendChild(copyright);
+    }
 }
 
 // NEU: Funktion zum Anwenden der Sprache auf statische UI-Elemente
@@ -524,6 +547,16 @@ function applyLanguageToUI() {
     }
 
     injectCustomShiftButtons(); // NEU: Buttons aktualisieren, wenn Sprache geändert wird
+
+    // NEU: Copyright Text aktualisieren
+    const copyright = document.getElementById('appCopyright');
+    if (copyright) {
+        const currentYear = new Date().getFullYear();
+        copyright.innerHTML = `
+            <div style="font-weight: 600; margin-bottom: 4px;">&copy; ${currentYear} Alexander Gettinger</div>
+            <div style="font-size: 0.9em;">${t.settings.allRightsReserved}</div>
+        `;
+    }
 }
 
 // NEU: Globale Variablen für die Urlaubsauswahl im Kalender
@@ -1052,6 +1085,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     injectLanguageSelector(); // NEU: Sprachauswahl einfügen
     applyLanguageToUI(); // NEU: Initiale Übersetzung anwenden
+    injectCopyright(); // NEU: Copyright einfügen
 
     determineAppVersion(); // NEU: Version vom Service Worker abrufen
 
@@ -3344,6 +3378,9 @@ function openUrlaubsantragWithDates(startDateStr, endDateStr) {
 
 	// Dynamische Felder einfügen
 	ensureUrlaubsantragFields();
+
+    // NEU: Buttons durch Dropdown ersetzen
+    injectVacationActionUI();
 }
 
 // NEU: Hilfsfunktion zum Sicherstellen der Zusatzfelder im Antrag
@@ -3376,6 +3413,65 @@ function ensureUrlaubsantragFields() {
 			grundInput.parentNode.parentNode.insertBefore(extraRemarkDiv, grundInput.parentNode.nextSibling);
 		}
 	}
+}
+
+// NEU: Funktion zum Ersetzen der Buttons durch ein Dropdown
+function injectVacationActionUI() {
+    const container = document.querySelector('#urlaubsantragDialogOverlay .button-group');
+    if (!container) return;
+
+    // Alte Buttons ausblenden/entfernen
+    container.innerHTML = '';
+
+    const t = uiTranslations[currentLanguage];
+    
+    // Wrapper für die neue UI
+    const wrapper = document.createElement('div');
+    wrapper.style.width = '100%';
+    wrapper.style.display = 'flex';
+    wrapper.style.gap = '10px';
+    wrapper.style.flexDirection = 'column';
+
+    // Dropdown
+    const select = document.createElement('select');
+    select.id = 'vacationActionSelect';
+    select.className = 'settings-option'; // Wiederverwendung existierender Klasse für Style
+    select.style.width = '100%';
+    select.style.padding = '10px';
+    select.style.marginBottom = '0';
+    
+    select.innerHTML = `
+        <option value="submit">${t.vacation.actions.submit}</option>
+        <option value="pdf">${t.vacation.actions.pdf}</option>
+        <option value="print">${t.vacation.actions.print}</option>
+    `;
+
+    // Ausführen Button
+    const btn = document.createElement('button');
+    btn.className = 'confirm-button';
+    btn.style.width = '100%';
+    btn.textContent = t.vacation.actions.execute;
+    btn.onclick = handleVacationAction;
+
+    wrapper.appendChild(select);
+    wrapper.appendChild(btn);
+    container.appendChild(wrapper);
+}
+
+// NEU: Handler für die Urlaubs-Aktionen
+function handleVacationAction() {
+    const action = document.getElementById('vacationActionSelect').value;
+    
+    if (action === 'submit') {
+        // Speichern als "Beantragt" und Exportieren für Manager
+        generateUrlaubsantragPDF('export_json');
+    } else if (action === 'pdf') {
+        // Nur PDF generieren (speichert auch im Kalender)
+        generateUrlaubsantragPDF('download');
+    } else if (action === 'print') {
+        // Drucken (speichert auch im Kalender)
+        generateUrlaubsantragPDF('print');
+    }
 }
 
 if (closeUrlaubsantragDialog) {
@@ -3460,7 +3556,7 @@ if (generatePdfButton) {
 	});
 }
 
-function addVacationRangeToCalendar(startDateStr, endDateStr, typeName = '', remark = '', typeId = '1') {
+function addVacationRangeToCalendar(startDateStr, endDateStr, typeName = '', remark = '', typeId = '1', status = 'requested', existingRequestId = null, grund = '', zusatzBemerkung = '') {
 	const start = new Date(startDateStr + 'T12:00:00');
 	const end = new Date(endDateStr + 'T12:00:00');
 
@@ -3469,6 +3565,9 @@ function addVacationRangeToCalendar(startDateStr, endDateStr, typeName = '', rem
 
 	let cachedYear = null;
 	let cachedHolidays = [];
+    
+    // Eindeutige ID für diesen Antrag generieren (oder existierende verwenden bei Wiederherstellung)
+    const requestId = existingRequestId || 'req_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 
 	for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
 		const dateString = formatDate(d);
@@ -3505,7 +3604,11 @@ function addVacationRangeToCalendar(startDateStr, endDateStr, typeName = '', rem
                          emoji: '',
                          recurring: false,
                          type: isVacationType ? 'vacation' : 'note',
-                         vacationTypeId: typeId
+                         vacationTypeId: typeId,
+                         status: status, // requested, approved, rejected
+                         requestId: requestId,
+                         grund: grund, // NEU: Grund speichern
+                         zusatzBemerkung: zusatzBemerkung // NEU: Zusatzbemerkung speichern
                      });
                  }
             }
@@ -3518,7 +3621,8 @@ function addVacationRangeToCalendar(startDateStr, endDateStr, typeName = '', rem
         updateAutoNoteForDate(formatDate(d));
     }
 	generateCalendar(currentCalendarYear);
-	showToast(uiTranslations[currentLanguage].prompts.vacationAdded, 'success');
+    // Rückgabe der ID für den Export
+    return requestId;
 }
 
 function generateUrlaubsantragPDF(action = 'download') {
@@ -3568,9 +3672,26 @@ function generateUrlaubsantragPDF(action = 'download') {
 			return;
 		}
 
-		if (confirm(uiTranslations[currentLanguage].prompts.addVacationConfirm)) {
+        let requestId = null;
+        let shouldSave = false;
+
+        // Bei "Beantragen" (export_json) automatisch speichern, sonst fragen
+        if (action === 'export_json') {
+            shouldSave = true;
+        } else {
+            shouldSave = confirm(uiTranslations[currentLanguage].prompts.addVacationConfirm);
+        }
+
+		if (shouldSave) {
             const typeName = VACATION_TYPES[selectedType] || 'Urlaub';
-			addVacationRangeToCalendar(dateFrom, dateTo, typeName, (selectedType === '5' || selectedType === '6') ? grund : zusatzBemerkung, selectedType);
+            // Status ist standardmäßig 'requested' (beantragt)
+			requestId = addVacationRangeToCalendar(dateFrom, dateTo, typeName, (selectedType === '5' || selectedType === '6') ? grund : zusatzBemerkung, selectedType, 'requested', null, grund, zusatzBemerkung);
+            if (action !== 'export_json') {
+                showToast(uiTranslations[currentLanguage].prompts.vacationAdded, 'success');
+            }
+		} else if (action === 'export_json') {
+            // Sollte theoretisch nicht erreicht werden, wenn oben true gesetzt wird
+            return;
 		}
 
 		// Hole alle Feiertage für das Jahr
@@ -3623,6 +3744,44 @@ function generateUrlaubsantragPDF(action = 'download') {
 		} else {
 			console.log('Logo nicht gefunden');
 		}
+
+        // NEU: JSON Export Logik für "Beantragen"
+        if (action === 'export_json') {
+            const exportData = {
+                requestId: requestId, // Wichtig für die Zuordnung
+                name: name,
+                vorname: userProfile.vorname,
+                nachname: userProfile.nachname,
+                personalNummer: personalnr,
+                abteilung: userProfile.abteilung || '',
+                dateFrom: dateFrom,
+                dateTo: dateTo,
+                type: selectedType,
+                workingDays: workingDays,
+                grund: grund,
+                zusatzBemerkung: zusatzBemerkung,
+                signature: userProfile.signature,
+                createdDate: new Date().toISOString(),
+                status: 'requested'
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            // Dateiname: Antrag_Name_Datum.json
+            a.download = `Antrag_${name.replace(/\s+/g, '_')}_${dateFrom}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            restoreViewport();
+            showToast(uiTranslations[currentLanguage].prompts.requestExported, 'success');
+            document.getElementById('urlaubsantragDialogOverlay').classList.remove('active');
+            return; // PDF Generierung überspringen
+        }
 
 		const htmlContent = `
             <!DOCTYPE html>
@@ -4098,14 +4257,6 @@ function formatGermanDate(dateString) {
 	return `${day}.${month}.${year}`;
 }
 
-// PDF drucken
-if (sendUrlaubsantragButton) {
-	sendUrlaubsantragButton.textContent = 'PDF drucken';
-	sendUrlaubsantragButton.addEventListener('click', () => {
-		generateUrlaubsantragPDF('print');
-	});
-}
-
 // NEU: Funktion zum Exportieren des Antrags für den Manager
 const exportUrlaubsantragButton = document.getElementById('exportUrlaubsantragButton');
 if (exportUrlaubsantragButton) {
@@ -4305,6 +4456,7 @@ function createOverviewDialog() {
         dialog.innerHTML = `
             <button id="closeOverviewDialog" class="close-button">&times;</button>
             <h3>🏖️ ${t.overview.title}</h3>
+            <div style="text-align:center; margin-bottom:10px;"><button id="importManagerResponseBtn" class="action-button" style="font-size:0.9em; padding:8px;">${t.vacation.importManager}</button></div>
             <div id="overviewContent" style="max-height: 60vh; overflow-y: auto; margin-top: 10px;"></div>
         `;
         
@@ -4316,6 +4468,9 @@ function createOverviewDialog() {
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) overlay.classList.remove('active');
         });
+
+        // Event Listener für Import
+        document.getElementById('importManagerResponseBtn').addEventListener('click', importManagerResponse);
     } else {
         overlay.querySelector('h3').textContent = '🏖️ ' + t.overview.title;
     }
@@ -4348,7 +4503,9 @@ function showOverview() {
         let currentGroup = {
             dates: [sortedDates[0]],
             note: getNoteText(sortedDates[0]),
-            isVacation: vacationData[sortedDates[0]]
+            isVacation: vacationData[sortedDates[0]],
+            // Status aus dem ersten Eintrag holen
+            statusData: importantDates.find(d => d.date === sortedDates[0] && d.type === 'vacation')
         };
         
         for (let i = 1; i < sortedDates.length; i++) {
@@ -4376,7 +4533,8 @@ function showOverview() {
                 currentGroup = {
                     dates: [dateStr],
                     note: note,
-                    isVacation: isVacation
+                    isVacation: isVacation,
+                    statusData: importantDates.find(d => d.date === dateStr && d.type === 'vacation')
                 };
             }
         }
@@ -4426,7 +4584,8 @@ function showOverview() {
             endDate: group.dates[group.dates.length - 1],
             daysCount: daysCount,
             note: group.note, 
-            isVacation: group.isVacation 
+            isVacation: group.isVacation,
+            statusData: group.statusData
         });
 	});
 	
@@ -4446,7 +4605,7 @@ function showOverview() {
 			let breakdownHtml = '';
 			const sortedTypes = Object.keys(yearData.typeCounts).sort();
 			if (sortedTypes.length > 0) {
-				breakdownHtml = '<div style="font-size: 0.85em; color: #555; margin-top: 5px; padding: 5px; background: #fff; border-radius: 4px; border: 1px solid #ddd;">';
+				breakdownHtml = '<div class="year-breakdown">';
 				sortedTypes.forEach(tid => {
 					const count = yearData.typeCounts[tid];
 					const tname = VACATION_TYPES[tid] || 'Sonstiges';
@@ -4457,10 +4616,10 @@ function showOverview() {
 
 			const yearSection = document.createElement('div');
 			yearSection.innerHTML = `
-				<div style="background-color: #eee; padding: 10px; font-weight: bold; border-radius: 5px; margin-bottom: 5px;">
+				<div class="year-header">
 					<div style="display: flex; justify-content: space-between; align-items: center;">
 						<span>${yearLabel}</span>
-						<span style="font-size: 0.9em; background: #fff; padding: 2px 6px; border-radius: 4px;">${t.overview.total}: ${yearData.vacationCount} ${t.overview.days}</span>
+						<span class="year-total-badge">${t.overview.total}: ${yearData.vacationCount} ${t.overview.days}</span>
 					</div>
 					${breakdownHtml}
 				</div>
@@ -4514,6 +4673,41 @@ function showOverview() {
 				if (entry.isVacation) {
 					const vacText = `${t.overview.title} (${entry.daysCount} ${t.overview.days})`;
 					html += `<div style="color: #6f42c1; margin-bottom: 3px; display: flex; align-items: center;"><i class="fas fa-calendar-minus" style="width: 25px; text-align: center; margin-right: 5px;"></i> ${vacText}</div>`;
+                    
+                    // STATUS ANZEIGE
+                    if (entry.statusData) {
+                        let statusHtml = '';
+                        const s = entry.statusData.status;
+                        if (s === 'approved') {
+                            statusHtml = `<span style="color:green; font-weight:bold;">${t.vacation.status.approved}</span>`;
+                        } else if (s === 'rejected') {
+                            statusHtml = `<span style="color:red; font-weight:bold;">${t.vacation.status.rejected}</span>`;
+                            if (entry.statusData.rejectionReason) {
+                                statusHtml += `<div style="font-size:0.85em; color:#dc3545; margin-left:5px;">${t.vacation.status.reason}: ${entry.statusData.rejectionReason}</div>`;
+                            }
+                        } else {
+                            statusHtml = `<span style="color:#ffc107; font-weight:bold; text-shadow: 0px 0px 1px #999;">${t.vacation.status.requested}</span>`;
+                        }
+                        html += `<div style="margin-top:2px; font-size:0.9em;">Status: ${statusHtml}</div>`;
+                        
+                        // PDF Button für genehmigte/abgelehnte Anträge
+                        if (s === 'approved' || s === 'rejected') {
+                            const pdfBtn = document.createElement('button');
+                            pdfBtn.className = 'action-button';
+                            pdfBtn.style.fontSize = '0.8em';
+                            pdfBtn.style.padding = '5px 10px';
+                            pdfBtn.style.marginTop = '5px';
+                            pdfBtn.style.width = 'auto';
+                            pdfBtn.innerHTML = `<i class="fas fa-file-pdf"></i> ${t.vacation.viewPdf}`;
+                            pdfBtn.onclick = (e) => { e.stopPropagation(); generateFinalVacationPDF(entry); };
+                            // Wir fügen den Button später zum Container hinzu, da wir hier im String sind.
+                            // Workaround: Button HTML string bauen
+                            html += `<button class="view-pdf-btn" style="margin-top:5px; padding:5px 10px; cursor:pointer; background:#333; color:white; border:none; border-radius:4px; font-size:0.85em;" data-entry='${JSON.stringify(entry).replace(/'/g, "&#39;")}'>${t.vacation.viewPdf}</button>`;
+                        }
+                    } else {
+                         // Fallback für alte Einträge
+                         html += `<div style="margin-top:2px; font-size:0.9em;">Status: <span style="color:#aaa;">${t.vacation.status.unknown}</span></div>`;
+                    }
 				}
 				
 				if (entry.note) {
@@ -4541,6 +4735,15 @@ function showOverview() {
                 });
                 li.appendChild(deleteBtn);
 
+                // Event Listener für den PDF Button (da er dynamisch im HTML String war)
+                const pdfBtn = li.querySelector('.view-pdf-btn');
+                if (pdfBtn) {
+                    pdfBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        generateFinalVacationPDF(entry);
+                    });
+                }
+
 				ul.appendChild(li);
 			});
 			
@@ -4550,6 +4753,374 @@ function showOverview() {
 	}
 	
 	document.getElementById('overviewDialogOverlay').classList.add('active');
+}
+
+// NEU: Funktion zum Importieren der Manager-Antwort
+function importManagerResponse() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const response = JSON.parse(event.target.result);
+                if (!response.requestId || !response.status) {
+                    throw new Error('Ungültiges Format');
+                }
+                
+                // Suche alle Einträge mit dieser Request ID
+                let updatedCount = 0;
+                importantDates.forEach(entry => {
+                    if (entry.requestId === response.requestId) {
+                        entry.status = response.status;
+                        if (response.status === 'rejected') {
+                            entry.rejectionReason = response.rejectionReason || 'Kein Grund angegeben';
+                        }
+                        // NEU: Manager Signatur und Datum speichern
+                        if (response.managerSignature) {
+                            entry.managerSignature = response.managerSignature;
+                        }
+                        if (response.processedDate) {
+                            entry.processedDate = response.processedDate;
+                        }
+
+                        updatedCount++;
+                    }
+                });
+                
+                if (updatedCount > 0) {
+                    localStorage.setItem('importantDates', JSON.stringify(importantDates));
+                    const statusText = response.status === 'approved' ? uiTranslations[currentLanguage].vacation.status.approved : uiTranslations[currentLanguage].vacation.status.rejected;
+                    showToast(uiTranslations[currentLanguage].prompts.statusUpdated.replace('{0}', statusText), 'success');
+                    showOverview(); // Liste neu laden
+                } else if (response.originalRequest) {
+                    // NEU: Wiederherstellungs-Logik, falls Antrag gelöscht wurde
+                    const req = response.originalRequest;
+                    const t = uiTranslations[currentLanguage];
+                    const typeName = t.vacation.types[req.type] || 'Urlaub';
+                    
+                    // Urlaub wieder in den Kalender eintragen (mit der alten ID)
+                    addVacationRangeToCalendar(
+                        req.dateFrom, 
+                        req.dateTo, 
+                        typeName, 
+                        (req.type === '5' || req.type === '6') ? req.grund : req.zusatzBemerkung, 
+                        req.type, 
+                        response.status,
+                        response.requestId, // WICHTIG: Alte ID wiederverwenden
+                        req.grund,
+                        req.zusatzBemerkung
+                    );
+
+                    // Die neu erstellten Einträge mit den Manager-Daten (Unterschrift, Grund) anreichern
+                    // Da addVacationRangeToCalendar speichert, müssen wir das Array neu laden oder direkt bearbeiten
+                    // importantDates ist global, wurde durch addVacationRangeToCalendar aktualisiert.
+                    importantDates.forEach(entry => {
+                        if (entry.requestId === response.requestId) {
+                            if (response.status === 'rejected') {
+                                entry.rejectionReason = response.rejectionReason || 'Kein Grund angegeben';
+                            }
+                            if (response.managerSignature) {
+                                entry.managerSignature = response.managerSignature;
+                            }
+                            if (response.processedDate) {
+                                entry.processedDate = response.processedDate;
+                            }
+                        }
+                    });
+                    localStorage.setItem('importantDates', JSON.stringify(importantDates));
+                    showToast(t.prompts.vacationRestored || 'Urlaub wiederhergestellt', 'success');
+                    showOverview();
+                } else {
+                    showToast(uiTranslations[currentLanguage].prompts.noRequestFound, 'error');
+                }
+                
+            } catch (err) {
+                console.error(err);
+                showToast(uiTranslations[currentLanguage].prompts.importError, 'error');
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
+
+// NEU: Funktion zum Generieren des finalen PDFs (wie Manager)
+function generateFinalVacationPDF(entry) {
+    if (!entry || !entry.statusData) return;
+
+    const status = entry.statusData.status;
+    const managerSig = entry.statusData.managerSignature;
+    const processedDate = entry.statusData.processedDate ? new Date(entry.statusData.processedDate) : new Date();
+    
+    // Daten rekonstruieren
+    const name = (userProfile.vorname || '') + ' ' + (userProfile.nachname || '');
+    const personalnr = userProfile.personalNummer || '';
+    const abteilung = userProfile.abteilung || '';
+    const dateFrom = entry.startDate;
+    const dateTo = entry.endDate;
+    
+    // Typ und Grund aus Note parsen oder statusData
+    let typeId = entry.statusData.vacationTypeId || '1';
+    
+    // NEU: Grund und Zusatzbemerkung aus den gespeicherten Daten holen
+    let reason = entry.statusData.grund || '';
+    let remark = entry.statusData.zusatzBemerkung || '';
+    
+    // Fallback für alte Einträge: Versuch, Grund aus dem Namen zu extrahieren
+    if (!reason && !remark && entry.note && entry.note.includes(':')) {
+        const parts = entry.note.split(':');
+        if (parts.length > 1) {
+            const val = parts[1].trim();
+            // Alte Logik: Bei Typ 5/6 war der Grund im Namen, bei anderen die Zusatzbemerkung
+            if (typeId === '5' || typeId === '6') {
+                reason = val;
+            } else {
+                remark = val;
+                // Bei Typ 1-4 war der Grund verloren gegangen, wir nutzen hier remark als Fallback für die Anzeige,
+                // aber idealerweise sollte reason gefüllt sein.
+                reason = val; // Damit zumindest etwas in der Zeile steht
+            }
+        }
+    }
+
+    // NEU: Felder für PDF vorbereiten (inkl. Ablehnungsgrund)
+    let fieldGrund56 = '';
+    let fieldBemerkung = '';
+
+    if (typeId === '5' || typeId === '6') {
+        fieldGrund56 = reason;
+        // Bei Typ 5/6 ist Bemerkung normalerweise leer, hier kommt der Ablehnungsgrund hin
+        if (status === 'rejected' && entry.statusData.rejectionReason) {
+            fieldBemerkung = `Ablehnung: ${entry.statusData.rejectionReason}`;
+        }
+    } else {
+        fieldBemerkung = reason;
+        if (status === 'rejected' && entry.statusData.rejectionReason) {
+            if (fieldBemerkung) fieldBemerkung += ' | ';
+            fieldBemerkung += `Ablehnung: ${entry.statusData.rejectionReason}`;
+        }
+    }
+
+    // Arbeitstage berechnen (Logik kopiert von generateUrlaubsantragPDF)
+    const fromDate = new Date(dateFrom);
+    const toDate = new Date(dateTo);
+    const year = fromDate.getFullYear();
+    const yearHolidays = getHolidaysForYear(year);
+    const countWeekends = userProfile.countWeekends || false;
+    const holidayDates = new Set(yearHolidays.map(h => h.date));
+    let workingDays = 0;
+
+    for (let d = new Date(fromDate); d <= toDate; d.setDate(d.getDate() + 1)) {
+        const dateStr = formatDate(d);
+        const shiftClass = getShiftForDate(dateStr);
+        const isHoliday = holidayDates.has(dateStr);
+        const dayOfWeek = d.getDay();
+        const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+        const isWorkDay = shiftClass !== 'freischicht';
+        if (isWorkDay && (!isWeekend || countWeekends) && !isHoliday) {
+            workingDays++;
+        }
+    }
+
+    // Viewport fix
+    const metaViewport = document.querySelector('meta[name="viewport"]');
+    const originalViewportContent = metaViewport ? metaViewport.getAttribute('content') : '';
+    const restoreViewport = () => {
+        if (metaViewport && originalViewportContent) {
+            metaViewport.setAttribute('content', originalViewportContent);
+        }
+    };
+    if (metaViewport) {
+        metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
+    }
+
+    const wasDarkMode = document.body.classList.contains('dark-mode');
+    if (wasDarkMode) document.body.classList.remove('dark-mode');
+
+    try {
+        // Logo
+        const logoImg = document.querySelector('.logo');
+        let logoDataUrl = '';
+        if (logoImg && logoImg.src) {
+            const canvas = document.createElement('canvas');
+            canvas.width = logoImg.naturalWidth || 150;
+            canvas.height = logoImg.naturalHeight || 100;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(logoImg, 0, 0);
+            logoDataUrl = canvas.toDataURL('image/png');
+        }
+
+        // Status Stempel
+        const statusColor = status === 'approved' ? 'green' : 'red';
+        const statusText = status === 'approved' ? 'GENEHMIGT' : 'ABGELEHNT';
+        const statusStamp = `
+            <div style="
+                position: absolute; 
+                top: 150px; 
+                right: 50px; 
+                border: 3px solid ${statusColor}; 
+                color: ${statusColor}; 
+                font-size: 24pt; 
+                font-weight: bold; 
+                padding: 10px; 
+                transform: rotate(-15deg);
+                opacity: 0.8;
+                z-index: 100;
+            ">${statusText}</div>
+        `;
+
+        // HTML Template (angepasst von manager.js)
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html lang="de">
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    @page { size: A5 landscape; margin: 5mm; }
+                    body { font-family: Arial, sans-serif; font-size: 9pt; color: #000; line-height: 1.1; margin: 0; padding: 10px; background-color: #fff; position: relative; }
+                    .pdf-wrapper { width: 100%; height: 130mm; display: flex; justify-content: center; align-items: center; }
+                    .container { width: 100%; max-width: 195mm; margin: 0 auto; }
+                    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+                    .header h1 { font-size: 14pt; margin: 0; }
+                    .logo { color: #db261f; font-weight: 900; font-size: 120pt; position: absolute; top: -38px; right: 30px; }
+                    .top-fields { display: flex; gap: 10px; margin-bottom: 10px; }
+                    .field-group { display: flex; align-items: flex-end; border-bottom: 1px solid #000; }
+                    .field-group label { font-weight: bold; margin-right: 3px; white-space: nowrap; }
+                    .field-group input { border: none; width: 100%; outline: none; font-size: 9pt; background: transparent; }
+                    table { width: 100%; border-collapse: collapse; }
+                    td { padding: 3px 0; vertical-align: middle; }
+                    .col-num { width: 15px; font-weight: bold; font-size: 9pt; }
+                    .col-label { width: 180px; font-weight: bold; font-size: 9pt; }
+                    .small-label { font-size: 9pt; font-weight: normal; }
+                    .inline-input { border: none; border-bottom: 1px solid #000; outline: none; font-size: 8.5pt; background: transparent; text-align: center; }
+                    .krank-container { margin-top: 10px; font-size: 8.7pt; }
+                    .krank-title { font-weight: bold; font-size: 8.6pt; }
+                    .bottom-grid { display: grid; grid-template-columns: 1fr 320px; gap: 15px; margin-top: 10px; }
+                    .remarks-area div { margin-bottom: 6px; display: flex; font-size: 8pt; font-weight: bold; align-items: center; }
+                    .doctor-box { border: 1px solid #000; padding: 5px; min-height: 55px; max-width: 270px; font-size: 6pt; }
+                    .doctor-stamp { margin-top: 12px; border-top: 1px dotted #666; font-size: 6pt; }
+                    .signature-section { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 15px; }
+                    .sig-row { display: flex; gap: 20px; margin-top: 30px; align-items: flex-end; }
+                    .sig-field { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; }
+                    .sig-line { border-bottom: 1px solid #000; height: 1px; width: 100%; margin-bottom: 2px; }
+                    .sig-val { text-align: center; font-size: 9pt; margin-bottom: 2px; min-height: 15px; position: relative; }
+                    .sig-label { font-size: 7pt; text-align: center; }
+                </style>
+            </head>
+            <body>
+            <div class="logo">${logoDataUrl ? `<img src="${logoDataUrl}" style="max-height: 95px;">` : 'motherson |||'}</div>
+            <div class="pdf-wrapper">
+            <div class="container">
+                ${statusStamp}
+                <div class="header"><h1>Urlaubsantrag/ Abwesenheitsmeldung</h1></div>
+                <div class="top-fields">
+                    <div class="field-group" style="flex: 2;"><label>Name:</label><input type="text" value="${name}"></div>
+                    <div class="field-group" style="flex: 1;"><label>Pers-Nr:</label><input type="text" value="${personalnr}"></div>
+                    <div class="field-group" style="flex: 1;"><label>Kst./ Abtlg:</label><input type="text" value="${abteilung}"></div>
+                </div>
+                <table>
+                    <tr><td class="col-num">1.</td><td class="col-label">Tarifurlaub (01)</td><td><span class="small-label">vom</span> <input type="text" class="inline-input" style="width: 80px;" value="${typeId === '1' ? formatGermanDate(dateFrom) : ''}"> <span class="small-label">bis</span> <input type="text" class="inline-input" style="width: 80px;" value="${typeId === '1' ? formatGermanDate(dateTo) : ''}"> <span class="small-label">=</span> <input type="text" class="inline-input" style="width: 25px;" value="${typeId === '1' ? workingDays : ''}"> <span class="small-label">Tage &nbsp; Rest:</span> <input type="text" class="inline-input" style="width: 50px;"></td></tr>
+                    <tr><td class="col-num">2.</td><td class="col-label">Abbau (Gleit-)Zeitkonto (17)</td><td><span class="small-label">vom</span> <input type="text" class="inline-input" style="width: 80px;" value="${typeId === '2' ? formatGermanDate(dateFrom) : ''}"> <span class="small-label">bis</span> <input type="text" class="inline-input" style="width: 80px;" value="${typeId === '2' ? formatGermanDate(dateTo) : ''}"> <span class="small-label">=</span> <input type="text" class="inline-input" style="width: 25px;" value="${typeId === '2' ? workingDays : ''}"> <span class="small-label">Tage / von</span> <input type="text" class="inline-input" style="width: 35px;"> <span class="small-label">bis</span> <input type="text" class="inline-input" style="width: 35px;"> <span class="small-label">Uhr</span></td></tr>
+                    <tr><td class="col-num">3.</td><td class="col-label">Dienstreise/- gang (97)</td><td><span class="small-label">vom</span> <input type="text" class="inline-input" style="width: 80px;" value="${typeId === '3' ? formatGermanDate(dateFrom) : ''}"> <span class="small-label">bis</span> <input type="text" class="inline-input" style="width: 80px;" value="${typeId === '3' ? formatGermanDate(dateTo) : ''}"> <span class="small-label">=</span> <input type="text" class="inline-input" style="width: 25px;" value="${typeId === '3' ? workingDays : ''}"> <span class="small-label">Tage / von</span> <input type="text" class="inline-input" style="width: 35px;"> <span class="small-label">bis</span> <input type="text" class="inline-input" style="width: 35px;"> <span class="small-label">Uhr</span></td></tr>
+                    <tr><td class="col-num">4.</td><td class="col-label">Schulung (74)</td><td><span class="small-label">vom</span> <input type="text" class="inline-input" style="width: 80px;" value="${typeId === '4' ? formatGermanDate(dateFrom) : ''}"> <span class="small-label">bis</span> <input type="text" class="inline-input" style="width: 80px;" value="${typeId === '4' ? formatGermanDate(dateTo) : ''}"> <span class="small-label">=</span> <input type="text" class="inline-input" style="width: 25px;" value="${typeId === '4' ? workingDays : ''}"> <span class="small-label">Tage</span></td></tr>
+                    <tr><td class="col-num">5.</td><td class="col-label">tarifl. Freistellung (20/21)</td><td><span class="small-label">vom</span> <input type="text" class="inline-input" style="width: 80px;" value="${typeId === '5' ? formatGermanDate(dateFrom) : ''}"> <span class="small-label">bis</span> <input type="text" class="inline-input" style="width: 80px;" value="${typeId === '5' ? formatGermanDate(dateTo) : ''}"> <span class="small-label">=</span> <input type="text" class="inline-input" style="width: 25px;" value="${typeId === '5' ? workingDays : ''}"> <span class="small-label">Tage / von</span> <input type="text" class="inline-input" style="width: 35px;"> <span class="small-label">bis</span> <input type="text" class="inline-input" style="width: 35px;"> <span class="small-label">Uhr</span></td></tr>
+                    <tr><td class="col-num">6.</td><td class="col-label">unbez. Urlaub ( 30/34)</td><td><span class="small-label">vom</span> <input type="text" class="inline-input" style="width: 80px;" value="${typeId === '6' ? formatGermanDate(dateFrom) : ''}"> <span class="small-label">bis</span> <input type="text" class="inline-input" style="width: 80px;" value="${typeId === '6' ? formatGermanDate(dateTo) : ''}"> <span class="small-label">=</span> <input type="text" class="inline-input" style="width: 25px;" value="${typeId === '6' ? workingDays : ''}"> <span class="small-label">Tage</span> <span style="font-size: 6pt;">(Umzug: Adresse/Tel angeben)</span></td></tr>
+                </table>
+                <div class="krank-container">
+                    <span class="col-num">7.</span> <span class="krank-title" style="${typeId === '7'}">Krank (41)</span> &nbsp;
+                    <span class="small-label">Datum:</span> <input type="text" class="inline-input" style="width: 80px;" value="${typeId === '7' ? formatGermanDate(dateFrom) : ''}">
+                    <span class="small-label">um</span> <input type="text" class="inline-input" style="width: 35px;"> <span class="small-label">Uhr</span>
+                    <span class="small-label">Schicht:</span> <input type="text" class="inline-input" style="width: 100px;">
+                    <div style="margin-top: 5px; margin-left: 17px;"><span class="small-label">voraussichtliche Dauer:</span> <input type="text" class="inline-input" style="width: 60%;"></div>
+                </div>
+                <div class="bottom-grid">
+                    <div class="remarks-area">
+                        <div><span style="width: 80px; font-size: 8pt;">Grund 5, 6:</span> <input type="text" class="inline-input" style="width: 70%;" value="${fieldGrund56}"></div>
+                        <div><span style="width: 80px; font-size: 8pt;">Bemerkung:</span> <input type="text" class="inline-input" style="width: 70%;" value="${fieldBemerkung}"></div>
+                        <div><span style="width: 80px; font-size: 8pt;"></span> <input type="text" class="inline-input" style="width: 70%;" value="${remark}"></div>
+                    </div>
+                    <div class="doctor-box">
+                        <span class="small-label">Arztbesuch am</span> <input type="text" class="inline-input" style="width: 170px;">
+                        <span class="small-label">von</span> <input type="text" class="inline-input" style="width: 80px;"> <span class="small-label">bis</span> <input type="text" class="inline-input" style="width: 80px;"> <span class="small-label">Uhr</span>
+                        <div class="doctor-stamp">Unterschrift/ Stempel Arzt</div>
+                    </div>
+                </div>
+                <div class="signature-section">
+                    <div class="sig-block">
+                        <strong>Antragsteller:</strong>
+                        <div class="sig-row">
+                            <div class="sig-field" style="flex: 0.4;">
+                                <div class="sig-val">${formatGermanDate(new Date().toISOString().split('T')[0])}</div>
+                                <div class="sig-line"></div>
+                                <div class="sig-label">Datum</div>
+                            </div>
+                            <div class="sig-field">
+                                <div class="sig-val" style="height: 40px; display: flex; align-items: flex-end; justify-content: flex-end;">
+                                    ${userProfile.signature ? `<img src="${userProfile.signature}" style="max-height: 50px; max-width: 100%; position: relative; right: 55px;">` : ''}
+                                </div>
+                                <div class="sig-line"></div>
+                                <div class="sig-label">Unterschrift</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sig-block">
+                        <strong>Vorgesetzter:</strong>
+                        <div class="sig-row">
+                            <div class="sig-field" style="flex: 0.4;">
+                                <div class="sig-val">${formatGermanDate(processedDate.toISOString().split('T')[0])}</div>
+                                <div class="sig-line"></div>
+                                <div class="sig-label">Datum</div>
+                            </div>
+                            <div class="sig-field">
+                                <div class="sig-val" style="height: 40px; display: flex; align-items: flex-end; justify-content: center;">
+                                    ${managerSig ? `<img src="${managerSig}" style="max-height: 50px; max-width: 100%;">` : ''}
+                                </div>
+                                <div class="sig-line"></div>
+                                <div class="sig-label">Unterschrift</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            </body>
+            </html>
+        `;
+
+        const element = document.createElement('div');
+        element.innerHTML = htmlContent;
+
+        const opt = {
+            margin: [5, 5, 5, 5],
+            filename: `Entscheidung_${name.replace(/\s+/g, '_')}_${formatGermanDate(dateFrom)}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, logging: false, scrollY: 0, scrollX: 0 },
+            jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a5' }
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            if (wasDarkMode) document.body.classList.add('dark-mode');
+            restoreViewport();
+            showToast(uiTranslations[currentLanguage].prompts.pdfGenerated, 'success');
+        }).catch(err => {
+            if (wasDarkMode) document.body.classList.add('dark-mode');
+            restoreViewport();
+            console.error(err);
+            showToast(uiTranslations[currentLanguage].prompts.pdfError, 'error');
+        });
+
+    } catch (e) {
+        if (wasDarkMode) document.body.classList.add('dark-mode');
+        restoreViewport();
+        console.error(e);
+        showToast(uiTranslations[currentLanguage].prompts.generalError, 'error');
+    }
 }
 
 // --- NEU: STATISTIK FUNKTIONEN ---

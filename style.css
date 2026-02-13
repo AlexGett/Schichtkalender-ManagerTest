@@ -85,9 +85,9 @@ h2 {
 
 .logo {
     position: absolute;
-    margin-top: -50px;
+    top: -65px;
     right: 20px;
-    width: 150px;
+    width: 100px;
     height: auto;
     z-index: 10;
     cursor: pointer;
@@ -456,7 +456,7 @@ h2 {
     .logo {
         font-weight: 300;
         width: 100px;
-        top: -20px;
+        top: -65px;
         right: 10px;
     }
     .header-icon {
@@ -2080,4 +2080,49 @@ body.dark-mode .visual-shift-sequence {
 
 #openImportantDatesDialog {
     display: none;
+}
+
+/* Overview Year Header Styles */
+.year-header {
+    background-color: #eee;
+    padding: 10px;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.year-total-badge {
+    font-size: 0.9em;
+    background: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #333;
+}
+
+.year-breakdown {
+    font-size: 0.85em;
+    color: #555;
+    margin-top: 5px;
+    padding: 5px;
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* Dark Mode Overrides for Overview */
+body.dark-mode .year-header {
+    background-color: #3a3a3a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .year-total-badge {
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+}
+
+body.dark-mode .year-breakdown {
+    background-color: #2c2c2c;
+    color: #ccc;
+    border-color: #444;
 }

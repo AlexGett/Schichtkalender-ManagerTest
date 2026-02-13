@@ -126,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('generateFinalPdfBtn').addEventListener('click', generateFinalPDF);
+    document.getElementById('exportDecisionBtn').addEventListener('click', exportDecisionJSON);
 
     // Signature Toggle Logic
     const sigHeader = document.getElementById('managerSignatureHeader');
@@ -144,6 +145,12 @@ document.addEventListener('DOMContentLoaded', () => {
             sigContent.style.display = isHidden ? 'block' : 'none';
             sigIcon.className = isHidden ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
         });
+    }
+
+    // Copyright Year
+    const yearSpan = document.getElementById('copyrightYear');
+    if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
     }
 
     // Dark Mode Check
@@ -248,13 +255,18 @@ function setDecision(decision) {
 
 function checkFormValidity() {
     const btn = document.getElementById('generateFinalPdfBtn');
+    const exportBtn = document.getElementById('exportDecisionBtn');
     // Einfache Prüfung: Entscheidung muss getroffen sein. Unterschrift ist optional aber empfohlen.
     if (managerDecision) {
         btn.disabled = false;
         btn.style.opacity = 1;
+        exportBtn.disabled = false;
+        exportBtn.style.opacity = 1;
     } else {
         btn.disabled = true;
         btn.style.opacity = 0.5;
+        exportBtn.disabled = true;
+        exportBtn.style.opacity = 0.5;
     }
 }
 
@@ -714,4 +726,39 @@ function generateFinalPDF() {
         console.error(e);
         alert('Ein Fehler ist aufgetreten');
     }
+}
+
+// NEU: Funktion zum Exportieren der Entscheidung als JSON
+function exportDecisionJSON() {
+    if (!currentRequestData || !managerDecision) return;
+
+    // Grund abfragen bei Ablehnung (optional auch bei Genehmigung als Kommentar)
+    let reason = '';
+    if (managerDecision === 'rejected') {
+        reason = prompt("Bitte geben Sie einen Grund für die Ablehnung ein:", "Betriebliche Gründe");
+        if (reason === null) return; // Abbrechen
+    }
+
+    const responseData = {
+        requestId: currentRequestData.requestId, // ID vom Originalantrag
+        status: managerDecision, // 'approved' oder 'rejected'
+        rejectionReason: reason,
+        managerSignature: managerSettings.signature, // Optional zurücksenden
+        processedDate: new Date().toISOString(),
+        // NEU: Originalantrag mitsenden, falls der Mitarbeiter ihn gelöscht hat und wiederherstellen muss
+        originalRequest: currentRequestData
+    };
+
+    const dataStr = JSON.stringify(responseData, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Entscheidung_${currentRequestData.name.replace(/\s+/g, '_')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    Toastify({ text: "Entscheidungs-Datei erstellt!", duration: 3000, style: { background: "#28a745" } }).showToast();
 }
