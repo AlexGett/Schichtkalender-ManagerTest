@@ -245,10 +245,15 @@ h2 {
     gap: 1.9px;
     flex-grow: 1;
     overflow-x: auto;
-    scrollbar-width: none;
     -ms-overflow-style: none;
     position: relative;
     z-index: 2;
+}
+
+@supports (scrollbar-width: none) {
+    .kw-numbers-grid {
+        scrollbar-width: none;
+    }
 }
 
 .kw-numbers-grid::-webkit-scrollbar {
@@ -310,8 +315,13 @@ h2 {
     display: flex;
     flex-grow: 1;
     overflow-x: auto;
-    scrollbar-width: none;
     -ms-overflow-style: none;
+}
+
+@supports (scrollbar-width: none) {
+    .date-columns-container {
+        scrollbar-width: none;
+    }
 }
 
 .date-columns-container::-webkit-scrollbar {
@@ -1596,6 +1606,9 @@ body.dark-mode #profileNameDisplay.app-label {
 .btn-blue { background-color: #007bff !important; }
 .btn-blue:hover { background-color: #0056b3 !important; }
 
+.btn-green { background-color: #28a745 !important; }
+.btn-green:hover { background-color: #218838 !important; }
+
 #saveProfileButton { margin-top: 10px; }
 
 #customShiftSystemSection { display: none; }
@@ -1842,6 +1855,7 @@ body.dark-mode .profile-summary-card:hover {
     background: #fff;
     border-radius: 8px;
     border: 1px solid #ddd;
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -2007,4 +2021,8 @@ body.dark-mode .visual-shift-sequence {
     width: 30px;
     text-align: right;
     font-weight: bold;
+}
+
+#openImportantDatesDialog {
+    display: none;
 }
