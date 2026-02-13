@@ -1079,10 +1079,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const todayMonth = today.getMonth();
                 const monthCards = document.querySelectorAll('.month-card');
                 if (monthCards[todayMonth]) {
-                    monthCards[todayMonth].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    smoothScrollToElement(monthCards[todayMonth], 1500);
                 }
             }
-        }, 800); // Kurze Verzögerung für Rendering
+        }, 2000); // 2 Sekunden Verzögerung vor Start
     }
 });
 
@@ -1974,6 +1974,33 @@ if (todayButton) {
 			monthCards[todayMonth].scrollIntoView({ behavior: 'smooth', block: 'center' });
 		}
 	});
+}
+
+// Helper function for smooth scrolling with custom duration
+function smoothScrollToElement(element, duration) {
+    const targetPosition = element.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2) + (element.offsetHeight / 2);
+    const startPosition = window.scrollY;
+    const distance = targetPosition - startPosition;
+    let startTime = null;
+
+    function animation(currentTime) {
+        if (startTime === null) startTime = currentTime;
+        const timeElapsed = currentTime - startTime;
+        
+        const ease = (t, b, c, d) => {
+            t /= d / 2;
+            if (t < 1) return c / 2 * t * t + b;
+            t--;
+            return -c / 2 * (t * (t - 2) - 1) + b;
+        };
+
+        const run = ease(timeElapsed, startPosition, distance, duration);
+        window.scrollTo(0, run);
+
+        if (timeElapsed < duration) requestAnimationFrame(animation);
+    }
+
+    requestAnimationFrame(animation);
 }
 
 function setupDialog(openBtnId, dialogOverlayId, closeBtnId) {
