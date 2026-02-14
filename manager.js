@@ -391,11 +391,11 @@ function generateFinalPDF() {
             
                     .logo {
                         color: #db261f;
-                        font-weight: 900;
-                        font-size: 120pt;
+                        font-weight: 1;
+                        font-size: 1;
                         position: absolute;
-                        top: -38px;
-                        right: 30px;
+                        top: -50px;
+                        right: 0;
                     }
             
                     /* Top Info */
