@@ -4759,11 +4759,16 @@ function showOverview() {
 function importManagerResponse() {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.json';
+    input.accept = '.json,application/json';
+    input.style.display = 'none';
+    document.body.appendChild(input);
     
     input.onchange = e => {
         const file = e.target.files[0];
-        if (!file) return;
+        if (!file) {
+            document.body.removeChild(input);
+            return;
+        }
         
         const reader = new FileReader();
         reader.onload = (event) => {
@@ -4843,7 +4848,13 @@ function importManagerResponse() {
             } catch (err) {
                 console.error(err);
                 showToast(uiTranslations[currentLanguage].prompts.importError, 'error');
+            } finally {
+                document.body.removeChild(input);
             }
+        };
+        reader.onerror = () => {
+            document.body.removeChild(input);
+            showToast(uiTranslations[currentLanguage].prompts.importError, 'error');
         };
         reader.readAsText(file);
     };
