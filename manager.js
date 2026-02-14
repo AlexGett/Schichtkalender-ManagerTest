@@ -394,8 +394,8 @@ function generateFinalPDF() {
                         font-weight: 1;
                         font-size: 1;
                         position: absolute;
-                        top: -50px;
-                        right: 0;
+                        top: -30px;
+                        margin-right: 40px;
                     }
             
                     /* Top Info */

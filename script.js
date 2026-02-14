@@ -3838,8 +3838,8 @@ function generateUrlaubsantragPDF(action = 'download') {
                         font-weight: 1;
                         font-size: 1;
                         position: absolute;
-                        top: -50px;
-                        right: 0;
+                        top: -30px;
+                        margin-right: 40px;
                     }
             
                     /* Top Info */
@@ -4999,7 +4999,7 @@ function generateFinalVacationPDF(entry) {
                     .container { width: 100%; max-width: 195mm; margin: 0 auto; }
                     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
                     .header h1 { font-size: 14pt; margin: 0; }
-                    .logo { color: #db261f; font-weight: 1; font-size: 1; position: absolute; top: -50px; right: 0; }
+                    .logo { color: #db261f; font-weight: 1; font-size: 1; position: absolute; top: -30px; margin-right: 40px; }
                     .top-fields { display: flex; gap: 10px; margin-bottom: 10px; }
                     .field-group { display: flex; align-items: flex-end; border-bottom: 1px solid #000; }
                     .field-group label { font-weight: bold; margin-right: 3px; white-space: nowrap; }
