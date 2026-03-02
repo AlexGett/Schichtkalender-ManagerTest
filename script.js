@@ -5379,18 +5379,4 @@ function createBottomAppDock() {
             clearTimeout(dockTimeout);
 		}
 	});
-	
-	// In script.js hinzufügen:
-navigator.serviceWorker.addEventListener('message', event => {
-    if (event.data && event.data.type === 'SHARED_JSON_DATA') {
-        const jsonData = JSON.parse(event.data.payload);
-        console.log("Empfangene Schichtdaten:", jsonData);
-        
-        // HIER: Deine Funktion aufrufen, die den Kalender mit jsonData aktualisiert
-        // Beispiel: importSchichtplan(jsonData);
-        alert("Neuer Schichtplan wurde empfangen!");
-    }
-});
-
-	
 }

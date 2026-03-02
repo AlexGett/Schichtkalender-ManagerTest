@@ -1,4 +1,4 @@
-const CACHE_NAME = 'schichtkalender-cache-test-v1.2.57'; // Version erhöht
+const CACHE_NAME = 'schichtkalender-cache-test-v1.2.54';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -21,80 +21,33 @@ const urlsToCache = [
     '/ios/167.png',
     '/ios/180.png',
     '/ios/192.png',
-    '/ios/512.png'
+    '/ios/512.png',
+    // Hier können weitere spezifische Info-Dateien hinzugefügt werden,
+    // wenn du möchtest, dass sie sofort gecacht werden.
+    // Ansonsten werden sie bei der ersten Anfrage gecacht.
+    // Beispiel: '/info_data/mein_info_bild.png',
+    // '/info_data/wichtige_infos.pdf'
 ];
 
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-        .then(cache => cache.addAll(urlsToCache))
-    );
-});
-
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheName !== CACHE_NAME) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
+        .then(cache => {
+            return cache.addAll(urlsToCache);
         })
-    );
-});
-
-// NEU: Logik für Web Share Target (POST Abfangen)
-self.addEventListener('fetch', event => {
-    const url = new URL(event.request.url);
-
-    // Prüfen, ob dies die Share-Aktion ist
-    if (event.request.method === 'POST' && url.pathname.endsWith('/share-target')) {
-        event.respondWith(
-            (async () => {
-                const formData = await event.request.formData();
-                const file = formData.get('json_file');
-                const jsonText = await file.text();
-                
-                // Wir öffnen die App und hängen den JSON-Inhalt als Parameter an 
-                // oder nutzen postMessage, wenn die App bereits offen ist.
-                // Einfachste Methode: Zurück zur Startseite und Daten via Message senden
-                const client = await self.clients.openWindow('./?shared=true');
-                
-                // Warten, bis die Seite geladen ist, dann Daten senden
-                setTimeout(() => {
-                    if (client) {
-                        client.postMessage({
-                            type: 'SHARED_JSON_DATA',
-                            payload: jsonText
-                        });
-                    }
-                }, 2000); 
-
-                return Response.redirect('./?shared=true', 303);
-            })()
-        );
-        return;
-    }
-
-    // Standard Cache-First Strategie für alle anderen Anfragen
-    event.respondWith(
-        caches.match(event.request).then(response => {
-            return response || fetch(event.request).then(networkResponse => {
-                if (!networkResponse || networkResponse.status !== 200) return networkResponse;
-                const responseToCache = networkResponse.clone();
-                caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
-                return networkResponse;
-            });
-        }).catch(() => console.log('Offline-Fehler bei:', event.request.url))
+        .catch(error => {
+            console.error('Fehler beim Caching der Dateien:', error);
+        })
     );
 });
 
 self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
+        // Diese Anweisung sorgt dafür, dass der neue Service Worker sofort aktiv wird
+        // und den alten ersetzt, ohne dass der Benutzer alle Tabs schließen muss.
         self.skipWaiting();
     }
+    // NEU: Version an den Client senden
     if (event.data && event.data.type === 'GET_VERSION') {
         const versionMatch = CACHE_NAME.match(/v(\d+\.\d+\.\d+)/);
         const version = versionMatch ? versionMatch[1] : 'Unknown';
@@ -102,4 +55,47 @@ self.addEventListener('message', (event) => {
             event.ports[0].postMessage({ version });
         }
     }
+});
+
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request)
+        .then(response => {
+            if (response) {
+                return response;
+            }
+            return fetch(event.request).then(
+                networkResponse => {
+                    if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+                        return networkResponse;
+                    }
+                    
+                    const responseToCache = networkResponse.clone();
+                    
+                    caches.open(CACHE_NAME)
+                        .then(cache => {
+                            cache.put(event.request, responseToCache);
+                        });
+                    return networkResponse;
+                }
+            ).catch(() => {
+                console.log('Fetch fehlgeschlagen für:', event.request.url);
+            });
+        })
+    );
+});
+
+self.addEventListener('activate', event => {
+    const cacheWhitelist = [CACHE_NAME];
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheWhitelist.indexOf(cacheName) === -1) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
+    );
 });
