@@ -1,4 +1,4 @@
-const CACHE_NAME = 'schichtkalender-cache-test-v1.2.56'; // Version erhöht
+const CACHE_NAME = 'schichtkalender-cache-test-v1.2.57'; // Version erhöht
 const urlsToCache = [
     '/',
     '/index.html',
