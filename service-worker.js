@@ -58,6 +58,30 @@ self.addEventListener('message', (event) => {
 });
 
 self.addEventListener('fetch', event => {
+    const url = new URL(event.request.url);
+
+    // Share Target Logic: Abfangen von geteilten Dateien
+    if (event.request.method === 'POST' && url.pathname.includes('share-target')) {
+        event.respondWith(
+            (async () => {
+                const formData = await event.request.formData();
+                const file = formData.get('file');
+
+                if (file) {
+                    const text = await file.text();
+                    // Sende Daten an alle offenen Fenster
+                    const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+                    for (const client of clients) {
+                        client.postMessage({ type: 'OPEN_FILE', content: text });
+                        if ('focus' in client) client.focus();
+                    }
+                }
+                return Response.redirect('./', 303);
+            })()
+        );
+        return;
+    }
+
     event.respondWith(
         caches.match(event.request)
         .then(response => {

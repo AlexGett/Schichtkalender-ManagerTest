@@ -2553,6 +2553,68 @@ function backupSettings() {
 	showToast(uiTranslations[currentLanguage].prompts.backupCreated, 'success');
 }
 
+// NEU: Hilfsfunktion zum Anwenden von Backup-Daten (ausgelagert für Share Target)
+function applySettingsData(loadedData) {
+    // Lösche nur die relevanten alten Daten
+    ['currentCalendarYear', 'calendarNotes', 'customShiftSystem',
+        'animationsDisabled', 'calendarBorderColor', 'darkModeEnabled', 'autoDarkModeEnabled', 'calendarVacations', 'userProfile', 'importantDates',
+        'phoneNumbers', 'calendarLanguage'
+    ]
+    .forEach(key => localStorage.removeItem(key));
+
+    // Lade die neuen Daten
+    for (const key in loadedData) {
+        if (loadedData.hasOwnProperty(key)) {
+            localStorage.setItem(key, loadedData[key]);
+        }
+    }
+
+    // Aktualisiere globale Variablen und UI
+    currentCalendarYear = parseInt(localStorage.getItem('currentCalendarYear')) || new Date().getFullYear();
+    notesData = JSON.parse(localStorage.getItem('calendarNotes')) || {};
+    vacationData = JSON.parse(localStorage.getItem('calendarVacations')) || {};
+    customShiftSystem = JSON.parse(localStorage.getItem('customShiftSystem')) || { sequence: [], referenceStartDate: null, referenceShiftType: null };
+    userProfile = JSON.parse(localStorage.getItem('userProfile')) || { name: '', personalNummer: '', abteilung: '', signature: null };
+    importantDates = JSON.parse(localStorage.getItem('importantDates')) || [];
+    phoneNumbers = JSON.parse(localStorage.getItem('phoneNumbers')) || [];
+    
+    // Sprache aktualisieren
+    const newLang = localStorage.getItem('calendarLanguage');
+    if (newLang && validLanguages.includes(newLang)) {
+        currentLanguage = newLang;
+        const langSelect = document.getElementById('languageSelect');
+        if (langSelect) langSelect.value = currentLanguage;
+        applyLanguageToUI();
+        
+        const langContainer = document.getElementById('languageSelectorContainer');
+        if (langContainer) {
+            langContainer.querySelector('h4').textContent = '🌐 ' + uiTranslations[currentLanguage].settings.language;
+        }
+    }
+
+    loadProfile(); // Profil-UI aktualisieren
+    renderImportantDatesList(); // Terminliste aktualisieren
+    
+    // Aktualisiere die UI-Elemente im Settings-Dialog sofort
+    document.getElementById('toggleAnimations').checked = (localStorage.getItem('animationsDisabled') === 'true');
+    document.getElementById('borderColorPicker').value = localStorage.getItem('calendarBorderColor') || '#0161FD';
+    document.getElementById('toggleDarkMode').checked = (localStorage.getItem('darkModeEnabled') === 'true');
+    document.getElementById('toggleAutoDarkMode').checked = (localStorage.getItem('autoDarkModeEnabled') === 'true');
+
+    const parsedSystem = JSON.parse(localStorage.getItem('customShiftSystem'));
+    if (parsedSystem) {
+        document.getElementById('customShiftSequence').value = parsedSystem.sequence_input || '';
+        document.getElementById('customShiftStartDate').value = parsedSystem.referenceStartDate_input || '';
+        document.getElementById('customShiftStartType').value = parsedSystem.referenceShiftType_input || '';
+    }
+
+    updateDarkModeState(); // Stelle sicher, dass der Dark Mode korrekt angewendet wird
+
+    generateCalendar(currentCalendarYear); // Kalender neu rendern
+    showToast(uiTranslations[currentLanguage].prompts.backupRestored, 'success');
+    document.getElementById('settingsDialogOverlay').classList.remove('active'); // Dialog schließen
+}
+
 // Funktion zum Laden eines Backups der Einstellungen
 function restoreSettings() {
 	if (!confirm(uiTranslations[currentLanguage].prompts.backupRestoreConfirm)) {
@@ -2573,63 +2635,7 @@ function restoreSettings() {
 		reader.onload = function(event) {
 			try {
 				const loadedData = JSON.parse(event.target.result);
-
-				// Lösche nur die relevanten alten Daten, nicht das gesamte localStorage
-				['currentCalendarYear', 'calendarNotes', 'customShiftSystem',
-					'animationsDisabled', 'calendarBorderColor', 'darkModeEnabled', 'autoDarkModeEnabled', 'calendarVacations', 'userProfile', 'importantDates',
-                    'phoneNumbers', 'calendarLanguage'
-				]
-				.forEach(key => localStorage.removeItem(key));
-
-				// Lade die neuen Daten
-				for (const key in loadedData) {
-					if (loadedData.hasOwnProperty(key)) {
-						localStorage.setItem(key, loadedData[key]);
-					}
-				}
-
-				// Aktualisiere globale Variablen und UI
-				currentCalendarYear = parseInt(localStorage.getItem('currentCalendarYear')) || new Date().getFullYear();
-				notesData = JSON.parse(localStorage.getItem('calendarNotes')) || {};
-				vacationData = JSON.parse(localStorage.getItem('calendarVacations')) || {};
-				customShiftSystem = JSON.parse(localStorage.getItem('customShiftSystem')) || { sequence: [], referenceStartDate: null, referenceShiftType: null };
-				userProfile = JSON.parse(localStorage.getItem('userProfile')) || { name: '', personalNummer: '', abteilung: '', signature: null };
-                importantDates = JSON.parse(localStorage.getItem('importantDates')) || [];
-                phoneNumbers = JSON.parse(localStorage.getItem('phoneNumbers')) || [];
-                
-                // Sprache aktualisieren
-                const newLang = localStorage.getItem('calendarLanguage');
-                if (newLang && validLanguages.includes(newLang)) {
-                    currentLanguage = newLang;
-                    const langSelect = document.getElementById('languageSelect');
-                    if (langSelect) langSelect.value = currentLanguage;
-                    applyLanguageToUI();
-                    
-                    const langContainer = document.getElementById('languageSelectorContainer');
-                    if (langContainer) {
-                        langContainer.querySelector('h4').textContent = '🌐 ' + uiTranslations[currentLanguage].settings.language;
-                    }
-                }
-
-				loadProfile(); // Profil-UI aktualisieren
-                renderImportantDatesList(); // Terminliste aktualisieren
-                
-				// Aktualisiere die UI-Elemente im Settings-Dialog sofort
-				document.getElementById('toggleAnimations').checked = (localStorage.getItem('animationsDisabled') === 'true');
-				document.getElementById('borderColorPicker').value = localStorage.getItem('calendarBorderColor') || '#0161FD';
-				document.getElementById('toggleDarkMode').checked = (localStorage.getItem('darkModeEnabled') === 'true');
-				document.getElementById('toggleAutoDarkMode').checked = (localStorage.getItem('autoDarkModeEnabled') === 'true');
-
-				const parsedSystem = JSON.parse(localStorage.getItem('customShiftSystem'));
-				document.getElementById('customShiftSequence').value = parsedSystem.sequence_input || '';
-				document.getElementById('customShiftStartDate').value = parsedSystem.referenceStartDate_input || '';
-				document.getElementById('customShiftStartType').value = parsedSystem.referenceShiftType_input || '';
-
-				updateDarkModeState(); // Stelle sicher, dass der Dark Mode korrekt angewendet wird
-
-				generateCalendar(currentCalendarYear); // Kalender neu rendern
-				showToast(uiTranslations[currentLanguage].prompts.backupRestored, 'success');
-				document.getElementById('settingsDialogOverlay').classList.remove('active'); // Dialog schließen
+                applySettingsData(loadedData);
 			} catch (error) {
 				console.error('Fehler beim Laden des Backups:', error);
 				showToast(uiTranslations[currentLanguage].prompts.backupError, 'error');
@@ -2640,6 +2646,35 @@ function restoreSettings() {
 	input.click(); // Öffne den Dateiauswahldialog
 }
 
+// NEU: Funktion zum Verarbeiten von geteilten JSON-Dateien (Share Target)
+function handleSharedJson(jsonContent) {
+    try {
+        const data = JSON.parse(jsonContent);
+        
+        // Versuche den Typ zu erkennen
+        if (data.requestId && (data.status || data.originalRequest)) {
+            // Es ist eine Manager-Antwort
+            applyManagerResponseData(data);
+        } else if (data.currentCalendarYear || data.userProfile || data.customShiftSystem) {
+            // Es ist ein Backup
+            if (confirm(uiTranslations[currentLanguage].prompts.backupRestoreConfirm)) {
+                applySettingsData(data);
+            }
+        } else if (Array.isArray(data) && data.length > 0 && data[0].name && data[0].number) {
+             // Telefonnummern Import
+             phoneNumbers = data;
+             localStorage.setItem('phoneNumbers', JSON.stringify(phoneNumbers));
+             renderPhoneDialog();
+             showToast('Telefonnummern importiert', 'success');
+        } else {
+            showToast('Unbekanntes Dateiformat', 'error');
+        }
+    } catch (e) {
+        console.error(e);
+        showToast('Fehler beim Verarbeiten der geteilten Datei', 'error');
+    }
+}
+
 // --- SERVICE WORKER REGISTRIERUNG & UPDATE-LOGIK ---
 function registerServiceWorker() {
 	if ('serviceWorker' in navigator) {
@@ -2647,6 +2682,13 @@ function registerServiceWorker() {
 			navigator.serviceWorker.register('./service-worker.js')
 				.then(registration => {
 					console.log('Service Worker registriert mit Scope:', registration.scope);
+
+                    // NEU: Listener für Nachrichten vom Service Worker (z.B. geteilte Dateien)
+                    navigator.serviceWorker.addEventListener('message', (event) => {
+                        if (event.data && event.data.type === 'OPEN_FILE') {
+                            handleSharedJson(event.data.content);
+                        }
+                    });
 
 					registration.addEventListener('updatefound', () => {
 						// Eine neue Version des Service Workers wurde gefunden und wird installiert.
@@ -4257,6 +4299,78 @@ function formatGermanDate(dateString) {
 	return `${day}.${month}.${year}`;
 }
 
+// NEU: Hilfsfunktion zum Anwenden der Manager-Antwort (ausgelagert für Share Target)
+function applyManagerResponseData(response) {
+    if (!response.requestId || !response.status) {
+        throw new Error('Ungültiges Format');
+    }
+    
+    // Suche alle Einträge mit dieser Request ID
+    let updatedCount = 0;
+    importantDates.forEach(entry => {
+        if (entry.requestId === response.requestId) {
+            entry.status = response.status;
+            if (response.status === 'rejected') {
+                entry.rejectionReason = response.rejectionReason || 'Kein Grund angegeben';
+            }
+            // NEU: Manager Signatur und Datum speichern
+            if (response.managerSignature) {
+                entry.managerSignature = response.managerSignature;
+            }
+            if (response.processedDate) {
+                entry.processedDate = response.processedDate;
+            }
+
+            updatedCount++;
+        }
+    });
+    
+    if (updatedCount > 0) {
+        localStorage.setItem('importantDates', JSON.stringify(importantDates));
+        const statusText = response.status === 'approved' ? uiTranslations[currentLanguage].vacation.status.approved : uiTranslations[currentLanguage].vacation.status.rejected;
+        showToast(uiTranslations[currentLanguage].prompts.statusUpdated.replace('{0}', statusText), 'success');
+        showOverview(); // Liste neu laden
+    } else if (response.originalRequest) {
+        // NEU: Wiederherstellungs-Logik, falls Antrag gelöscht wurde
+        const req = response.originalRequest;
+        const t = uiTranslations[currentLanguage];
+        const typeName = t.vacation.types[req.type] || 'Urlaub';
+        
+        // Urlaub wieder in den Kalender eintragen (mit der alten ID)
+        addVacationRangeToCalendar(
+            req.dateFrom, 
+            req.dateTo, 
+            typeName, 
+            (req.type === '5' || req.type === '6') ? req.grund : req.zusatzBemerkung, 
+            req.type, 
+            response.status,
+            response.requestId, // WICHTIG: Alte ID wiederverwenden
+            req.grund,
+            req.zusatzBemerkung
+        );
+
+        // Die neu erstellten Einträge mit den Manager-Daten (Unterschrift, Grund) anreichern
+        importantDates.forEach(entry => {
+            if (entry.requestId === response.requestId) {
+                if (response.status === 'rejected') {
+                    entry.rejectionReason = response.rejectionReason || 'Kein Grund angegeben';
+                }
+                if (response.managerSignature) {
+                    entry.managerSignature = response.managerSignature;
+                }
+                if (response.processedDate) {
+                    entry.processedDate = response.processedDate;
+                }
+            }
+        });
+        localStorage.setItem('importantDates', JSON.stringify(importantDates));
+        showToast(t.prompts.vacationRestored || 'Urlaub wiederhergestellt', 'success');
+        showOverview();
+    } else {
+        showToast(uiTranslations[currentLanguage].prompts.noRequestFound, 'error');
+    }
+}
+
 // NEU: Funktion zum Exportieren des Antrags für den Manager
 const exportUrlaubsantragButton = document.getElementById('exportUrlaubsantragButton');
 if (exportUrlaubsantragButton) {
@@ -4774,77 +4888,7 @@ function importManagerResponse() {
         reader.onload = (event) => {
             try {
                 const response = JSON.parse(event.target.result);
-                if (!response.requestId || !response.status) {
-                    throw new Error('Ungültiges Format');
-                }
-                
-                // Suche alle Einträge mit dieser Request ID
-                let updatedCount = 0;
-                importantDates.forEach(entry => {
-                    if (entry.requestId === response.requestId) {
-                        entry.status = response.status;
-                        if (response.status === 'rejected') {
-                            entry.rejectionReason = response.rejectionReason || 'Kein Grund angegeben';
-                        }
-                        // NEU: Manager Signatur und Datum speichern
-                        if (response.managerSignature) {
-                            entry.managerSignature = response.managerSignature;
-                        }
-                        if (response.processedDate) {
-                            entry.processedDate = response.processedDate;
-                        }
-
-                        updatedCount++;
-                    }
-                });
-                
-                if (updatedCount > 0) {
-                    localStorage.setItem('importantDates', JSON.stringify(importantDates));
-                    const statusText = response.status === 'approved' ? uiTranslations[currentLanguage].vacation.status.approved : uiTranslations[currentLanguage].vacation.status.rejected;
-                    showToast(uiTranslations[currentLanguage].prompts.statusUpdated.replace('{0}', statusText), 'success');
-                    showOverview(); // Liste neu laden
-                } else if (response.originalRequest) {
-                    // NEU: Wiederherstellungs-Logik, falls Antrag gelöscht wurde
-                    const req = response.originalRequest;
-                    const t = uiTranslations[currentLanguage];
-                    const typeName = t.vacation.types[req.type] || 'Urlaub';
-                    
-                    // Urlaub wieder in den Kalender eintragen (mit der alten ID)
-                    addVacationRangeToCalendar(
-                        req.dateFrom, 
-                        req.dateTo, 
-                        typeName, 
-                        (req.type === '5' || req.type === '6') ? req.grund : req.zusatzBemerkung, 
-                        req.type, 
-                        response.status,
-                        response.requestId, // WICHTIG: Alte ID wiederverwenden
-                        req.grund,
-                        req.zusatzBemerkung
-                    );
-
-                    // Die neu erstellten Einträge mit den Manager-Daten (Unterschrift, Grund) anreichern
-                    // Da addVacationRangeToCalendar speichert, müssen wir das Array neu laden oder direkt bearbeiten
-                    // importantDates ist global, wurde durch addVacationRangeToCalendar aktualisiert.
-                    importantDates.forEach(entry => {
-                        if (entry.requestId === response.requestId) {
-                            if (response.status === 'rejected') {
-                                entry.rejectionReason = response.rejectionReason || 'Kein Grund angegeben';
-                            }
-                            if (response.managerSignature) {
-                                entry.managerSignature = response.managerSignature;
-                            }
-                            if (response.processedDate) {
-                                entry.processedDate = response.processedDate;
-                            }
-                        }
-                    });
-                    localStorage.setItem('importantDates', JSON.stringify(importantDates));
-                    showToast(t.prompts.vacationRestored || 'Urlaub wiederhergestellt', 'success');
-                    showOverview();
-                } else {
-                    showToast(uiTranslations[currentLanguage].prompts.noRequestFound, 'error');
-                }
-                
+                applyManagerResponseData(response);
             } catch (err) {
                 console.error(err);
                 showToast(uiTranslations[currentLanguage].prompts.importError, 'error');
