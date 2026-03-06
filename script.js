@@ -5336,18 +5336,21 @@ function createBottomAppDock() {
         }
 
         const wrapper = document.createElement('div');
-        wrapper.className = 'app-icon-wrapper';
+        wrapper.className = 'app-item';
         
+        const iconContainer = document.createElement('div');
+        iconContainer.className = 'app-icon';
+
         const icon = document.createElement('span');
         icon.textContent = app.icon;
-        icon.style.fontSize = '28px';
-        icon.style.marginBottom = '5px';
         if (app.iconStyle) icon.style.cssText += app.iconStyle;
-        wrapper.appendChild(icon);
+        iconContainer.appendChild(icon);
         
         const label = document.createElement('span');
         label.className = 'app-label';
         label.textContent = app.label;
+        
+        wrapper.appendChild(iconContainer);
         wrapper.appendChild(label);
         
         wrapper.addEventListener('click', () => {
