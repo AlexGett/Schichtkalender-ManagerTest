@@ -1,4 +1,4 @@
-const CACHE_NAME = 'schichtkalender-cache-test-v1.2.60';
+const CACHE_NAME = 'schichtkalender-cache-test-v1.2.61';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -29,6 +29,8 @@ const urlsToCache = [
     // '/info_data/wichtige_infos.pdf'
 ];
 
+let pendingSharedFile = null;
+
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
@@ -55,6 +57,13 @@ self.addEventListener('message', (event) => {
             event.ports[0].postMessage({ version });
         }
     }
+    // NEU: Client fragt nach pending file (für Cold Start)
+    if (event.data && event.data.type === 'CHECK_FOR_FILE') {
+        if (pendingSharedFile) {
+            event.source.postMessage({ type: 'OPEN_FILE', content: pendingSharedFile });
+            pendingSharedFile = null; // Datei konsumiert
+        }
+    }
 });
 
 self.addEventListener('fetch', event => {
@@ -71,9 +80,14 @@ self.addEventListener('fetch', event => {
                     const text = await file.text();
                     // Sende Daten an alle offenen Fenster
                     const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-                    for (const client of clients) {
-                        client.postMessage({ type: 'OPEN_FILE', content: text });
-                        if ('focus' in client) client.focus();
+                    if (clients && clients.length > 0) {
+                        for (const client of clients) {
+                            client.postMessage({ type: 'OPEN_FILE', content: text });
+                            if ('focus' in client) client.focus();
+                        }
+                    } else {
+                        // Keine offenen Fenster (App war zu), Datei zwischenspeichern
+                        pendingSharedFile = text;
                     }
                 }
                 return Response.redirect('./', 303);

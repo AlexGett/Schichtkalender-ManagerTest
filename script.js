@@ -2690,6 +2690,11 @@ function registerServiceWorker() {
                         }
                     });
 
+                    // NEU: Beim Start prüfen, ob eine Datei wartet (Cold Start Fix)
+                    if (navigator.serviceWorker.controller) {
+                        navigator.serviceWorker.controller.postMessage({ type: 'CHECK_FOR_FILE' });
+                    }
+
 					registration.addEventListener('updatefound', () => {
 						// Eine neue Version des Service Workers wurde gefunden und wird installiert.
 						const newWorker = registration.installing;
