@@ -1530,10 +1530,9 @@ body.dark-mode #urlaubsantrag_signature_preview {
 }
 
 #bottomAppDockContent {
-    /* 1. Deckkraft reduziert (von 0.9 auf z.B. 0.3) */
-    background-color: rgba(255, 255, 255, 0.3); 
+    /* Den letzten Wert (Alpha) auf 0.1 gesetzt für mehr Durchsichtigkeit */
+    background-color: rgba(255, 255, 255, 0.1); 
     
-    /* Der Blur-Effekt greift jetzt viel besser */
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     
@@ -1543,10 +1542,8 @@ body.dark-mode #urlaubsantrag_signature_preview {
     gap: 20px 10px;
     justify-items: center;
     
-    /* 2. OPTIONAL: Heller statt dunkler Rand für einen besseren Glas-Look */
+    /* Der Rand bleibt bei 0.4, damit die Kante des Glases sichtbar bleibt */
     border-top: 1px solid rgba(255, 255, 255, 0.4); 
-    
-    /* Schatten etwas weicher gemacht für mehr Tiefe */
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1); 
     
     max-height: 60vh;
