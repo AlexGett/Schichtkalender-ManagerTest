@@ -1530,12 +1530,12 @@ body.dark-mode #urlaubsantrag_signature_preview {
 }
 
 #bottomAppDockContent {
-    /* --- Deine Einstellungen --- */
-    background-color: rgba(255, 255, 255, 0.1); /* Sehr durchsichtig */
-    backdrop-filter: blur(5px);                  /* Blur auf 5px reduziert */
+    /* 1. Basis & Transparenz */
+    background-color: rgba(255, 255, 255, 0.02); /* Fast komplett durchsichtig */
+    backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     
-    /* --- Layout & Form (unverändert) --- */
+    /* 2. Layout (deine Werte) */
     display: none; 
     padding: 25px 15px;
     grid-template-columns: repeat(4, 1fr);
@@ -1543,26 +1543,47 @@ body.dark-mode #urlaubsantrag_signature_preview {
     justify-items: center;
     max-height: 60vh;
     overflow-y: auto;
-    border-radius: 25px 25px 0 0; 
+    
+    /* Etwas stärkere Rundung sieht bei diesem Effekt oft besser aus (z.B. 40px) */
+    border-radius: 40px 40px 0 0; 
     padding-bottom: 50px; 
     
-    /* --- Der 3D-Effekt --- */
+    /* WICHTIG: position: relative, damit der Rand-Trick funktioniert */
+    position: relative; 
     
-    /* 1. Ein sehr feiner Rahmen um das ganze Element */
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    /* Falls du NUR oben einen Rahmen willst, nimm: border-top: 1px solid rgba(255, 255, 255, 0.3); */
-
-    /* 2. Die kombinierte Schatten-Magie (Kommagetrennt) */
+    /* 3. Licht und Schatten für die 3D-Dicke */
     box-shadow: 
-        /* Schatten A: Äußerer Schatten (Schwebe-Effekt, wie gehabt) */
-        0 -10px 40px rgba(0, 0, 0, 0.1),
-        
-        /* Schatten B: Innerer Highlight (Lichtkante oben) - Erzeugt den 3D-Look */
-        /* inset x y blur spread color */
-        inset 0 2px 1px 0px rgba(255, 255, 255, 0.5),
-        
-        /* Schatten C: Innerer Schatten unten (für Tiefe/Dicke) - Optional */
-        inset 0 -2px 3px 0px rgba(0, 0, 0, 0.05);
+        0 20px 40px rgba(0, 0, 0, 0.4),            /* Tiefer Außenschatten */
+        inset 0 1px 1px rgba(255, 255, 255, 0.8),  /* Harte Lichtkante oben */
+        inset 0 -1px 2px rgba(255, 255, 255, 0.1); /* Sanfte Reflexion unten */
+}
+
+/* 4. Der schillernde 3D-Glasrand (ohne Bild!) */
+#bottomAppDockContent::before {
+    content: "";
+    position: absolute;
+    inset: 0; /* Legt sich exakt über das Dock */
+    border-radius: inherit; /* Übernimmt exakt deine Rundungen von oben */
+    padding: 1px; /* Die Dicke unseres Glasrandes */
+    
+    /* Der Farbverlauf, der die Lichtbrechung (Regenbogen/Reflexion) simuliert */
+    background: linear-gradient(
+        135deg, 
+        rgba(255, 255, 255, 0.7) 0%, 
+        rgba(255, 200, 150, 0.2) 25%, /* Ein sanfter warmer Ton (Orange/Rot) */
+        rgba(255, 255, 255, 0.1) 50%, 
+        rgba(100, 200, 255, 0.2) 75%, /* Ein sanfter kühler Ton (Blau/Cyan) */
+        rgba(255, 255, 255, 0.5) 100%
+    );
+    
+    /* Die Maske schneidet die Mitte aus, sodass nur der Rand sichtbar bleibt */
+    -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    
+    pointer-events: none; /* Stellt sicher, dass du immer noch ins Dock klicken kannst */
 }
 
 .app-item {
