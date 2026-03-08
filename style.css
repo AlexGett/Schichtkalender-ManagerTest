@@ -1530,26 +1530,39 @@ body.dark-mode #urlaubsantrag_signature_preview {
 }
 
 #bottomAppDockContent {
-    /* Den letzten Wert (Alpha) auf 0.1 gesetzt für mehr Durchsichtigkeit */
-    background-color: rgba(255, 255, 255, 0.1); 
-    
-    backdrop-filter: blur(5px);
+    /* --- Deine Einstellungen --- */
+    background-color: rgba(255, 255, 255, 0.1); /* Sehr durchsichtig */
+    backdrop-filter: blur(5px);                  /* Blur auf 5px reduziert */
     -webkit-backdrop-filter: blur(5px);
     
+    /* --- Layout & Form (unverändert) --- */
     display: none; 
     padding: 25px 15px;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px 10px;
     justify-items: center;
-    
-    /* Der Rand bleibt bei 0.4, damit die Kante des Glases sichtbar bleibt */
-    border-top: 1px solid rgba(255, 255, 255, 0.4); 
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1); 
-    
     max-height: 60vh;
     overflow-y: auto;
     border-radius: 25px 25px 0 0; 
     padding-bottom: 50px; 
+    
+    /* --- Der 3D-Effekt --- */
+    
+    /* 1. Ein sehr feiner Rahmen um das ganze Element */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    /* Falls du NUR oben einen Rahmen willst, nimm: border-top: 1px solid rgba(255, 255, 255, 0.3); */
+
+    /* 2. Die kombinierte Schatten-Magie (Kommagetrennt) */
+    box-shadow: 
+        /* Schatten A: Äußerer Schatten (Schwebe-Effekt, wie gehabt) */
+        0 -10px 40px rgba(0, 0, 0, 0.1),
+        
+        /* Schatten B: Innerer Highlight (Lichtkante oben) - Erzeugt den 3D-Look */
+        /* inset x y blur spread color */
+        inset 0 2px 1px 0px rgba(255, 255, 255, 0.5),
+        
+        /* Schatten C: Innerer Schatten unten (für Tiefe/Dicke) - Optional */
+        inset 0 -2px 3px 0px rgba(0, 0, 0, 0.05);
 }
 
 .app-item {
