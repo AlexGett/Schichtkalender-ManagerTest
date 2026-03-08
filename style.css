@@ -1530,8 +1530,8 @@ body.dark-mode #urlaubsantrag_signature_preview {
 }
 
 #bottomAppDockContent {
-    /* 1. Basis & Transparenz */
-    background-color: rgba(255, 255, 255, 0.02); /* Fast komplett durchsichtig */
+    /* 1. Basis: Sehr transparentes Glas */
+    background-color: rgba(255, 255, 255, 0.05); 
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     
@@ -1543,19 +1543,27 @@ body.dark-mode #urlaubsantrag_signature_preview {
     justify-items: center;
     max-height: 60vh;
     overflow-y: auto;
-    
-    /* Etwas stärkere Rundung sieht bei diesem Effekt oft besser aus (z.B. 40px) */
     border-radius: 40px 40px 0 0; 
     padding-bottom: 50px; 
     
-    /* WICHTIG: position: relative, damit der Rand-Trick funktioniert */
-    position: relative; 
-    
-    /* 3. Licht und Schatten für die 3D-Dicke */
+    /* 3. Der "Dicke-Glas-Lupe"-Effekt durch reine Lichtkanten */
+    /* Ein hauchdünner weißer Rand für die absolute Außenkante */
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+
     box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.4),            /* Tiefer Außenschatten */
-        inset 0 1px 1px rgba(255, 255, 255, 0.8),  /* Harte Lichtkante oben */
-        inset 0 -1px 2px rgba(255, 255, 255, 0.1); /* Sanfte Reflexion unten */
+        /* Der Schatten nach unten (das Glas schwebt leicht) */
+        0 15px 35px rgba(0, 0, 0, 0.2),            
+        
+        /* Die harte Lichtbrechung direkt an der Kante oben */
+        inset 0 1px 0px rgba(255, 255, 255, 0.5),  
+        
+        /* Die "Dicke" des Glases (die Wölbung der Lupe nach innen) */
+        inset 0 4px 8px rgba(255, 255, 255, 0.15), 
+        
+        /* Ein leichter dunklerer Schatten innen für mehr Kontrast zur Wölbung */
+        inset 0 15px 20px rgba(0, 0, 0, 0.02);
 }
 
 /* 4. Der schillernde 3D-Glasrand (ohne Bild!) */
