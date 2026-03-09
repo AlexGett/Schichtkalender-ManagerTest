@@ -1609,8 +1609,8 @@ body.dark-mode #urlaubsantrag_signature_preview {
 }
 
 .app-icon {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
     background-color: #333333;
     border-radius: 16px;
     display: flex;
