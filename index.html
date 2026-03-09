@@ -24,7 +24,8 @@
         <span class="header-icon info-icon-position beat-animation" id="openShiftInfoDialog">ℹ️</span>
         <span id="todayButton" class="header-icon today-icon-position beat-animation">🗓️</span>
         <span id="openImportantDatesDialog"></span>
-        <img src="logo.PNG" alt="Logo" class="logo" id="openSettingsDialog">
+        <img src="logo.PNG" alt="Logo" class="logo">
+        <div id="openSettingsDialog" style="display:none;"></div>
 
         <div class="header-section">
             <h1 id="currentYearDisplay">2025</h1>
@@ -114,10 +115,6 @@
             <div id="tab-general" class="tab-content active">
                 <!-- Sprachauswahl wird hier per JS eingefügt -->
                 <div class="settings-option">
-                    <label for="toggleAnimations">Pulsieren ausschalten:</label>
-                    <input type="checkbox" id="toggleAnimations">
-                </div>
-                <div class="settings-option">
                     <label for="toggleScrollToToday">Beim Start zu Heute scrollen:</label>
                     <input type="checkbox" id="toggleScrollToToday">
                 </div>
@@ -132,6 +129,18 @@
                 <div class="settings-option">
                     <label for="toggleDarkMode">Dark Mode aktivieren:</label>
                     <input type="checkbox" id="toggleDarkMode">
+                </div>
+                <div class="settings-option">
+                    <label for="toggleAnimations">Animationen aktivieren:</label>
+                    <input type="checkbox" id="toggleAnimations">
+                </div>
+                <div class="settings-option">
+                    <label for="toggleAnimationsMonth">Hintergrund-Animation aktivieren:</label>
+                    <input type="checkbox" id="toggleAnimationsMonth">
+                </div>
+                <div class="settings-option">
+                    <label for="toggleAnimationsWeek">Kalender-Animation aktivieren:</label>
+                    <input type="checkbox" id="toggleAnimationsWeek">
                 </div>
             </div>
 

@@ -39,9 +39,16 @@ body {
     }
 }
 
-.calendar-container.no-animation {
+.calendar-container.no-animation,
+.calendar-container.no-animation-month {
     animation: none;
     box-shadow: 0 0 10px var(--calendar-border-color);
+}
+
+.calendar-container.no-animation .week-numbers-container::before,
+.calendar-container.no-animation-week .week-numbers-container::before {
+    animation: none;
+    display: none;
 }
 
 .header-section {
@@ -192,8 +199,8 @@ h2 {
         90deg,
         transparent 0%,
         transparent 20%,
-        #DCDCDC 30%,
-        #DCDCDC 70%,
+        var(--calendar-border-color) 30%,
+        var(--calendar-border-color) 70%,
         transparent 80%,
         transparent 100%
     );
@@ -486,7 +493,7 @@ h2 {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 10000;
     visibility: hidden;
     opacity: 0;
     transition: visibility 0s, opacity 0.3s ease;
@@ -1513,6 +1520,7 @@ body.dark-mode #urlaubsantrag_signature_preview {
     display: flex;
     flex-direction: column;
     font-family: sans-serif;
+    pointer-events: none;
 }
 
 #bottomAppDockTrigger {
@@ -1527,16 +1535,32 @@ body.dark-mode #urlaubsantrag_signature_preview {
     align-items: center;
     gap: 10px;
     box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+    pointer-events: auto;
+    position: relative;
+    z-index: 2;
 }
 
 #bottomAppDockContent {
     /* 1. Basis: Sehr transparentes Glas */
     background-color: rgba(255, 255, 255, 0.05); 
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
     
     /* 2. Layout (deine Werte) */
-    display: none; 
+    display: grid; 
+    opacity: 0;
+    transform: translateY(100%);
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 1;
+
+    /* Schließen: Sofortiges Runterfahren wie eine Schublade ohne Verzögerung */
+    transition: 
+        transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0s, 
+        opacity 0.3s ease 0.1s, 
+        backdrop-filter 0.3s ease 0s, -webkit-backdrop-filter 0.3s ease 0s,
+        visibility 0s 0.5s;
+
     padding: 25px 15px;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px 10px;
@@ -1564,6 +1588,23 @@ body.dark-mode #urlaubsantrag_signature_preview {
         
         /* Ein leichter dunklerer Schatten innen für mehr Kontrast zur Wölbung */
         inset 0 15px 20px rgba(0, 0, 0, 0.02);
+}
+
+#bottomAppDock.open #bottomAppDockContent {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
+
+    /* Öffnen: Erst hochfahren (1.2s), dann nach 1.2s Verzögerung Transparenz/Blur starten */
+    transition: 
+        transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0s, 
+        opacity 0.4s ease 0s, 
+        backdrop-filter 4s ease 1.2s, -webkit-backdrop-filter 4s ease 1.2s,
+        visibility 0s 0s;
+
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
 /* 4. Der schillernde 3D-Glasrand (ohne Bild!) */

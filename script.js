@@ -215,6 +215,8 @@ function applyLanguageToUI() {
         };
         
         setLabel('toggleAnimations', t.settings.animations);
+        setLabel('toggleAnimationsMonth', t.settings.animationsMonth);
+        setLabel('toggleAnimationsWeek', t.settings.animationsWeek);
         setLabel('toggleScrollToToday', t.settings.scrollToToday);
         setLabel('borderColorPicker', t.settings.borderColor);
         setLabel('toggleDarkMode', t.settings.darkMode);
@@ -2089,19 +2091,39 @@ setupDialog('openImportantDatesDialog', 'importantDatesDialogOverlay', 'closeImp
 
 const settingsDialogOverlay = document.getElementById('settingsDialogOverlay');
 const toggleAnimationsCheckbox = document.getElementById('toggleAnimations');
+const toggleAnimationsMonthCheckbox = document.getElementById('toggleAnimationsMonth');
+const toggleAnimationsWeekCheckbox = document.getElementById('toggleAnimationsWeek');
 const toggleScrollToTodayCheckbox = document.getElementById('toggleScrollToToday');
 const borderColorPicker = document.getElementById('borderColorPicker');
 const calendarContainer = document.getElementById('calendarContainer');
 const toggleDarkModeCheckbox = document.getElementById('toggleDarkMode');
 const toggleAutoDarkModeCheckbox = document.getElementById('toggleAutoDarkMode');
 
-const savedAnimationState = localStorage.getItem('animationsDisabled');
-if (savedAnimationState === 'true' || savedAnimationState === null) {
+const savedAnimationState = localStorage.getItem('animationsEnabled');
+if (savedAnimationState === 'true') {
 	toggleAnimationsCheckbox.checked = true;
-	calendarContainer.classList.add('no-animation');
+	calendarContainer.classList.remove('no-animation');
 } else {
 	toggleAnimationsCheckbox.checked = false;
-	calendarContainer.classList.remove('no-animation');
+	calendarContainer.classList.add('no-animation');
+}
+
+const savedMonthAnim = localStorage.getItem('animationsMonthEnabled');
+if (savedMonthAnim === 'true') {
+    if (toggleAnimationsMonthCheckbox) toggleAnimationsMonthCheckbox.checked = true;
+    calendarContainer.classList.remove('no-animation-month');
+} else {
+    if (toggleAnimationsMonthCheckbox) toggleAnimationsMonthCheckbox.checked = false;
+    calendarContainer.classList.add('no-animation-month');
+}
+
+const savedWeekAnim = localStorage.getItem('animationsWeekEnabled');
+if (savedWeekAnim === 'true') {
+    if (toggleAnimationsWeekCheckbox) toggleAnimationsWeekCheckbox.checked = true;
+    calendarContainer.classList.remove('no-animation-week');
+} else {
+    if (toggleAnimationsWeekCheckbox) toggleAnimationsWeekCheckbox.checked = false;
+    calendarContainer.classList.add('no-animation-week');
 }
 
 if (toggleScrollToTodayCheckbox) {
@@ -2156,14 +2178,57 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 });
 
 toggleAnimationsCheckbox.addEventListener('change', () => {
-	if (toggleAnimationsCheckbox.checked) {
-		calendarContainer.classList.add('no-animation');
-		localStorage.setItem('animationsDisabled', 'true');
-	} else {
-		calendarContainer.classList.remove('no-animation');
-		localStorage.setItem('animationsDisabled', 'false');
-	}
+    const isChecked = toggleAnimationsCheckbox.checked;
+    
+    // Master-Status (Pulsieren/Rahmen)
+    if (isChecked) {
+        calendarContainer.classList.remove('no-animation');
+        localStorage.setItem('animationsEnabled', 'true');
+    } else {
+        calendarContainer.classList.add('no-animation');
+        localStorage.setItem('animationsEnabled', 'false');
+    }
+
+    // Hintergrund-Animation synchronisieren
+    if (toggleAnimationsMonthCheckbox) {
+        toggleAnimationsMonthCheckbox.checked = isChecked;
+        if (isChecked) calendarContainer.classList.remove('no-animation-month');
+        else calendarContainer.classList.add('no-animation-month');
+        localStorage.setItem('animationsMonthEnabled', isChecked ? 'true' : 'false');
+    }
+
+    // Kalender-Animation synchronisieren
+    if (toggleAnimationsWeekCheckbox) {
+        toggleAnimationsWeekCheckbox.checked = isChecked;
+        if (isChecked) calendarContainer.classList.remove('no-animation-week');
+        else calendarContainer.classList.add('no-animation-week');
+        localStorage.setItem('animationsWeekEnabled', isChecked ? 'true' : 'false');
+    }
 });
+
+if (toggleAnimationsMonthCheckbox) {
+    toggleAnimationsMonthCheckbox.addEventListener('change', () => {
+        if (toggleAnimationsMonthCheckbox.checked) {
+            calendarContainer.classList.remove('no-animation-month');
+            localStorage.setItem('animationsMonthEnabled', 'true');
+        } else {
+            calendarContainer.classList.add('no-animation-month');
+            localStorage.setItem('animationsMonthEnabled', 'false');
+        }
+    });
+}
+
+if (toggleAnimationsWeekCheckbox) {
+    toggleAnimationsWeekCheckbox.addEventListener('change', () => {
+        if (toggleAnimationsWeekCheckbox.checked) {
+            calendarContainer.classList.remove('no-animation-week');
+            localStorage.setItem('animationsWeekEnabled', 'true');
+        } else {
+            calendarContainer.classList.add('no-animation-week');
+            localStorage.setItem('animationsWeekEnabled', 'false');
+        }
+    });
+}
 
 borderColorPicker.addEventListener('input', () => {
 	const newColor = borderColorPicker.value;
@@ -2524,7 +2589,7 @@ function backupSettings() {
 		if (key.startsWith('currentCalendarYear') ||
 			key.startsWith('calendarNotes') ||
 			key.startsWith('customShiftSystem') ||
-			key.startsWith('animationsDisabled') ||
+			key.startsWith('animations') ||
 			key.startsWith('calendarBorderColor') ||
 			key.startsWith('darkModeEnabled') ||
 			key.startsWith('autoDarkModeEnabled') ||
@@ -2557,7 +2622,9 @@ function backupSettings() {
 function applySettingsData(loadedData) {
     // Lösche nur die relevanten alten Daten
     ['currentCalendarYear', 'calendarNotes', 'customShiftSystem',
-        'animationsDisabled', 'calendarBorderColor', 'darkModeEnabled', 'autoDarkModeEnabled', 'calendarVacations', 'userProfile', 'importantDates',
+        'animationsDisabled', 'animationsMonthDisabled', 'animationsWeekDisabled',
+        'animationsEnabled', 'animationsMonthEnabled', 'animationsWeekEnabled',
+        'calendarBorderColor', 'darkModeEnabled', 'autoDarkModeEnabled', 'calendarVacations', 'userProfile', 'importantDates',
         'phoneNumbers', 'calendarLanguage'
     ]
     .forEach(key => localStorage.removeItem(key));
@@ -2596,7 +2663,9 @@ function applySettingsData(loadedData) {
     renderImportantDatesList(); // Terminliste aktualisieren
     
     // Aktualisiere die UI-Elemente im Settings-Dialog sofort
-    document.getElementById('toggleAnimations').checked = (localStorage.getItem('animationsDisabled') === 'true');
+    document.getElementById('toggleAnimations').checked = (localStorage.getItem('animationsEnabled') === 'true');
+    document.getElementById('toggleAnimationsMonth').checked = (localStorage.getItem('animationsMonthEnabled') === 'true');
+    document.getElementById('toggleAnimationsWeek').checked = (localStorage.getItem('animationsWeekEnabled') === 'true');
     document.getElementById('borderColorPicker').value = localStorage.getItem('calendarBorderColor') || '#0161FD';
     document.getElementById('toggleDarkMode').checked = (localStorage.getItem('darkModeEnabled') === 'true');
     document.getElementById('toggleAutoDarkMode').checked = (localStorage.getItem('autoDarkModeEnabled') === 'true');
@@ -5347,7 +5416,6 @@ function createBottomAppDock() {
 		dockContainer.classList.remove('open');
 		const icon = dockTrigger.querySelector('i');
 		icon.className = 'fas fa-bars';
-		dockContent.style.display = 'none';
         clearTimeout(dockTimeout);
 	};
 
@@ -5423,11 +5491,9 @@ function createBottomAppDock() {
 		const icon = dockTrigger.querySelector('i');
 		if (dockContainer.classList.contains('open')) {
 			icon.className = 'fas fa-chevron-down';
-			dockContent.style.display = 'grid';
             resetDockTimeout();
 		} else {
 			icon.className = 'fas fa-bars';
-			dockContent.style.display = 'none';
             clearTimeout(dockTimeout);
 		}
 	});
