@@ -1543,8 +1543,8 @@ body.dark-mode #urlaubsantrag_signature_preview {
 }
 
 #bottomAppDockContent {
-    /* 1. Basis: Sehr transparentes Glas */
-    background-color: rgba(255, 255, 255, 0.05); 
+    /* Startzustand: Komplett klar und ungefroren */
+    background-color: rgba(255, 255, 255, 0); 
     backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);
     
@@ -1556,11 +1556,12 @@ body.dark-mode #urlaubsantrag_signature_preview {
     pointer-events: none;
     z-index: 1;
 
-    /* Schließen: Beschleunigtes Abgleiten nach unten wie eine echte Schublade */
+    /* Sanftes "Auftauen" beim Schließen */
     transition: 
         transform 0.4s cubic-bezier(0.32, 0, 0.67, 0) 0s, 
         opacity 0.3s ease 0.1s, 
-        backdrop-filter 0.4s ease 0s, -webkit-backdrop-filter 0.4s ease 0s,
+        backdrop-filter 0.5s ease, -webkit-backdrop-filter 0.5s ease,
+        background-color 0.5s ease,
         visibility 0s 0.4s;
 
     padding: 25px 15px;
@@ -1572,24 +1573,13 @@ body.dark-mode #urlaubsantrag_signature_preview {
     border-radius: 40px 40px 0 0; 
     padding-bottom: 50px; 
     
-    /* 3. Der "Dicke-Glas-Lupe"-Effekt durch reine Lichtkanten */
-    /* Ein hauchdünner weißer Rand für die absolute Außenkante */
-    border-top: 1px solid rgba(255, 255, 255, 0.4);
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    /* Rahmen ist initial fast unsichtbar */
+    border-top: 2px solid rgba(255, 255, 255, 0);
+    border-left: 1px solid rgba(255, 255, 255, 0);
+    border-right: 1px solid rgba(255, 255, 255, 0);
 
-    box-shadow: 
-        /* Der Schatten nach unten (das Glas schwebt leicht) */
-        0 15px 35px rgba(0, 0, 0, 0.2),            
-        
-        /* Die harte Lichtbrechung direkt an der Kante oben */
-        inset 0 1px 0px rgba(255, 255, 255, 0.5),  
-        
-        /* Die "Dicke" des Glases (die Wölbung der Lupe nach innen) */
-        inset 0 4px 8px rgba(255, 255, 255, 0.15), 
-        
-        /* Ein leichter dunklerer Schatten innen für mehr Kontrast zur Wölbung */
-        inset 0 15px 20px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0);
+    transition: box-shadow 3s ease, border-color 3s ease;
 }
 
 #bottomAppDock.open #bottomAppDockContent {
@@ -1597,34 +1587,52 @@ body.dark-mode #urlaubsantrag_signature_preview {
     transform: translateY(0);
     visibility: visible;
     pointer-events: auto;
+    
+    /* Das "Gefrieren": Die Farbe wird frostig-weißblau und der Blur nimmt stark zu */
+    background-color: rgba(230, 250, 255, 0.35);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
 
-    /* Öffnen: Erst hochfahren (1.2s), dann nach 1.2s Verzögerung Transparenz/Blur starten */
+    /* Lichtkanten frieren ein */
+    border-top: 2px solid rgba(255, 255, 255, 0.9);
+    border-left: 1px solid rgba(255, 255, 255, 0.5);
+    border-right: 1px solid rgba(255, 255, 255, 0.5);
+
+    /* Eiskristall-Glow erscheint */
+    box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.2),            
+        inset 0 2px 6px rgba(255, 255, 255, 0.8),  
+        0 0 20px rgba(180, 230, 255, 0.4);
+
+    /* Lange Transition für den "Gefrier-Prozess" */
     transition: 
         transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0s, 
         opacity 0.3s ease 0s, 
-        backdrop-filter 1.5s ease 0.5s, -webkit-backdrop-filter 1.5s ease 0.5s,
+        backdrop-filter 3s ease-out 0.2s, 
+        -webkit-backdrop-filter 3s ease-out 0.2s,
+        background-color 2.5s ease-out 0.1s,
         visibility 0s 0s;
-
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
 }
 
-/* 4. Der schillernde 3D-Glasrand (ohne Bild!) */
+/* 4. Der kristalline Eisrand */
 #bottomAppDockContent::before {
     content: "";
     position: absolute;
     inset: 0; /* Legt sich exakt über das Dock */
     border-radius: inherit; /* Übernimmt exakt deine Rundungen von oben */
     padding: 1px; /* Die Dicke unseres Glasrandes */
+    opacity: 0;
+    transition: opacity 3.5s ease-in 0.4s;
+    pointer-events: none;
     
-    /* Der Farbverlauf, der die Lichtbrechung (Regenbogen/Reflexion) simuliert */
+    /* Icy-Gradient: Blau- und Weißtöne für Lichtbrechung */
     background: linear-gradient(
         135deg, 
-        rgba(255, 255, 255, 0.7) 0%, 
-        rgba(255, 200, 150, 0.2) 25%, /* Ein sanfter warmer Ton (Orange/Rot) */
-        rgba(255, 255, 255, 0.1) 50%, 
-        rgba(100, 200, 255, 0.2) 75%, /* Ein sanfter kühler Ton (Blau/Cyan) */
-        rgba(255, 255, 255, 0.5) 100%
+        rgba(255, 255, 255, 0.9) 0%, 
+        rgba(173, 216, 230, 0.4) 25%, 
+        rgba(255, 255, 255, 0.2) 50%, 
+        rgba(0, 191, 255, 0.4) 75%, 
+        rgba(255, 255, 255, 0.8) 100%
     );
     
     /* Die Maske schneidet die Mitte aus, sodass nur der Rand sichtbar bleibt */
@@ -1633,8 +1641,10 @@ body.dark-mode #urlaubsantrag_signature_preview {
         linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    
-    pointer-events: none; /* Stellt sicher, dass du immer noch ins Dock klicken kannst */
+}
+
+#bottomAppDock.open #bottomAppDockContent::before {
+    opacity: 1; /* Der kristalline Rand friert langsam ein */
 }
 
 .app-item {
@@ -1673,18 +1683,19 @@ body.dark-mode #urlaubsantrag_signature_preview {
 .app-icon {
     width: 60px;
     height: 60px;
-    /* 3D Glas-Effekt Hintergrund */
-    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    /* Eiswürfel-Effekt */
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(200, 240, 255, 0.4));
+    border: 1px solid rgba(255, 255, 255, 0.8);
     border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     
-    /* Mehrschichtiger Schatten für Tiefe (Außen- und Innenschatten) */
+    /* Kristalliner Schatten */
     box-shadow: 
-        0 10px 20px rgba(0,0,0,0.1), 
-        inset 0 -3px 6px rgba(0,0,0,0.05),
-        inset 0 3px 6px rgba(255,255,255,0.8);
+        0 8px 15px rgba(0,0,0,0.05), 
+        inset 0 2px 4px rgba(255,255,255,0.9),
+        inset 0 -2px 4px rgba(150,220,255,0.2);
         
     margin-bottom: 8px;
     font-size: 30px;
@@ -1734,17 +1745,18 @@ body.dark-mode #bottomAppDockTrigger {
     color: #dc3545;
 }
 body.dark-mode #bottomAppDockContent {
-    background-color: rgba(30, 30, 30, 0.9);
-    border-top: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    /* Tiefes Arktis-Blau im Dark Mode */
+    background-color: rgba(10, 35, 50, 0.75);
+    border-top: 2px solid rgba(200, 240, 255, 0.4);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
 }
 body.dark-mode .app-icon {
-    background: linear-gradient(145deg, #3a3a3a, #2c2c2c);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(0, 150, 255, 0.1));
     box-shadow: 
-        0 10px 20px rgba(0,0,0,0.4),
-        inset 0 -2px 5px rgba(0,0,0,0.5),
-        inset 0 2px 5px rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.05);
+        0 10px 20px rgba(0,0,0,0.3),
+        inset 0 -2px 5px rgba(0,0,0,0.4),
+        inset 0 2px 5px rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 body.dark-mode .app-icon::after {
