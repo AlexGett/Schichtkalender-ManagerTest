@@ -1291,34 +1291,25 @@ body.dark-mode .loading-message {
 
 /* Stile für die Update-Benachrichtigung */
 #update-banner button {
-    background-color: #ffffff;
-    color: #db261f; /* Schriftfarbe passend zum roten Banner */
-    border: none;
-    border-radius: 6px; /* Etwas weichere Ecken */
-    padding: 10px 20px; /* Großzügigere Klickfläche */
+    background-color: transparent;
+    color: #ffffff;
+    border: 2px solid #ffffff; /* Weißer Rand statt Hintergrund */
+    border-radius: 6px;
+    padding: 8px 20px;
     font-size: 0.95em;
-    font-weight: 700;
-    letter-spacing: 0.5px; /* Etwas mehr Zeichenabstand für Lesbarkeit */
+    font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Sanfter Schatten hebt den Button ab */
-    transition: all 0.25s ease; /* Weicher Übergang für alle Effekte */
+    transition: all 0.3s ease;
 }
 
 #update-banner button:hover {
-    background-color: #fcfcfc;
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.25); /* Schatten wird beim Hover größer */
-    transform: translateY(-2px); /* Button hebt sich leicht an */
+    background-color: #ffffff; /* Füllt sich beim Hover weiß */
+    color: #db261f; /* Schrift wird rot */
+    transform: scale(1.05); /* Wird ganz leicht größer */
 }
 
 #update-banner button:active {
-    transform: translateY(1px); /* Button wird beim Klicken "hineingedrückt" */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); /* Schatten wird kleiner */
-}
-
-/* Wichtig für die Barrierefreiheit (Tastaturnavigation) */
-#update-banner button:focus-visible {
-    outline: 2px solid #ffffff;
-    outline-offset: 3px;
+    transform: scale(0.98);
 }
 
 /* ===== SIGNATURE CANVAS STYLES ===== */
