@@ -5428,23 +5428,23 @@ function createBottomAppDock() {
     // HIER KANNST DU DIE REIHENFOLGE DER APPS ÄNDERN
     // Einfach die Zeilen in diesem Array verschieben
     const dockApps = [
-        { id: 'phone', label: t.dock.phone, icon: 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Telephone/3D/telephone_3d.png', type: 'trigger', target: 'openPhoneDialog' },
-        { id: 'today', label: t.dock.today, icon: 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Calendar/3D/calendar_3d.png', type: 'trigger', target: 'todayButton' },
-        { id: 'vacation', label: t.dock.vacation, icon: 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Memo/3D/memo_3d.png', type: 'fn', fn: showVacationModeDialog },
-        { id: 'absence', label: t.dock.absence, icon: 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Airplane/3D/airplane_3d.png', type: 'fn', fn: showOverview },
-        { id: 'important', label: t.dock.important, icon: 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Star/3D/star_3d.png', type: 'trigger', target: 'openImportantDatesDialog' },
-        { id: 'info', label: t.dock.info, icon: 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Information/3D/information_3d.png', type: 'trigger', target: 'openShiftInfoDialog' },
-        { id: 'stats', label: t.stats.shortTitle || 'Stats', icon: 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bar%20chart/3D/bar_chart_3d.png', type: 'fn', fn: createStatisticsDialog },
-        { id: 'workwear', label: t.dock.workwear, icon: 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/T-shirt/3D/t-shirt_3d.png', type: 'link', url: 'https://forms.office.com/e/YzwV8pCFgZ' },
-        { id: 'profile', label: t.dock.profile, icon: 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Bust%20in%20silhouette/3D/bust_in_silhouette_3d.png', type: 'trigger', target: 'profileNameDisplay' },
-        { id: 'settings', label: t.dock.settings, icon: 'https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Gear/3D/gear_3d.png', type: 'trigger', target: 'openSettingsDialog' }
+        { id: 'phone', label: t.dock.phone, icon: 'assets/app_icons/phone.png', type: 'trigger', target: 'openPhoneDialog' },
+        { id: 'today', label: t.dock.today, icon: 'assets/app_icons/calendar.png', type: 'trigger', target: 'todayButton' },
+        { id: 'vacation', label: t.dock.vacation, icon: 'assets/app_icons/vacation.png', type: 'fn', fn: showVacationModeDialog },
+        { id: 'absence', label: t.dock.absence, icon: 'assets/app_icons/plane.png', type: 'fn', fn: showOverview },
+        { id: 'important', label: t.dock.important, icon: 'assets/app_icons/star.png', type: 'trigger', target: 'openImportantDatesDialog' },
+        { id: 'info', label: t.dock.info, icon: 'assets/app_icons/info.png', type: 'trigger', target: 'openShiftInfoDialog' },
+        { id: 'stats', label: t.stats.shortTitle || 'Stats', icon: 'assets/app_icons/chart.png', type: 'fn', fn: createStatisticsDialog },
+        { id: 'workwear', label: t.dock.workwear, icon: 'assets/app_icons/tshirt.png', type: 'link', url: 'https://forms.office.com/e/YzwV8pCFgZ' },
+        { id: 'profile', label: t.dock.profile, icon: 'assets/app_icons/user.png', type: 'trigger', target: 'profileNameDisplay' },
+        { id: 'settings', label: t.dock.settings, icon: 'assets/app_icons/settings.png', type: 'trigger', target: 'openSettingsDialog' }
     ];
 
     dockApps.forEach(app => {
         // Prüfen, ob das Ziel-Element existiert (für Trigger-Typen)
         if (app.type === 'trigger') {
             const el = document.getElementById(app.target);
-            if (!el) return; // Überspringen, wenn Element nicht da ist
+            if (!el) return; // Überspringen, wenn Element nicht vorhanden ist
             
             // Original-Elemente ausblenden (außer Settings und Profile, die oft sichtbar bleiben sollen oder woanders liegen)
             if (app.target !== 'openSettingsDialog' && app.target !== 'profileNameDisplay') {
@@ -5458,25 +5458,10 @@ function createBottomAppDock() {
         const iconContainer = document.createElement('div');
         iconContainer.className = 'app-icon';
 
-        let icon;
-        if (app.icon.startsWith('http')) {
-            icon = document.createElement('img');
-            icon.src = app.icon;
-            icon.alt = app.label;
-        } else {
-            icon = document.createElement('i');
-            icon.className = app.icon;
-            if (app.color) {
-                if (app.color.includes('linear-gradient')) {
-                    icon.style.background = app.color;
-                    icon.style.webkitBackgroundClip = 'text';
-                    icon.style.webkitTextFillColor = 'transparent';
-                } else {
-                    icon.style.color = app.color;
-                }
-            }
-            icon.style.filter = 'drop-shadow(0 2px 2px rgba(0,0,0,0.2))';
-        }
+        const icon = document.createElement('img');
+        icon.src = app.icon;
+        icon.alt = app.label;
+        // Keine inline styles für Farben oder Filter, da dies jetzt über CSS für das <img> Element gesteuert wird
         iconContainer.appendChild(icon);
         
         const label = document.createElement('span');

@@ -1627,11 +1627,19 @@ body.dark-mode #urlaubsantrag_signature_preview {
     align-items: center;
     cursor: pointer;
     width: 100%;
-    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out; /* Schnellere Transition für Responsivität */
     -webkit-tap-highlight-color: transparent;
     opacity: 0;
     transform: translateY(40px) scale(0.85);
 }
+
+/* Reset transition-delay für die Schließanimation */
+#bottomAppDock:not(.open) .app-item {
+    transition-delay: 0s !important;
+    transform: translateY(20px) scale(0.9); /* Etwas weniger dramatischer Exit */
+    opacity: 0;
+}
+
 
 #bottomAppDock.open .app-item {
     opacity: 1;
@@ -1661,29 +1669,29 @@ body.dark-mode #urlaubsantrag_signature_preview {
     border-radius: 14px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center; /* Icon zentrieren */
     margin-bottom: 8px;
-    font-size: 30px;
+    /* font-size: 30px; -- ENTFERNT, wird jetzt von .app-icon i gehandhabt */
     position: relative;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease; /* Etwas schnellere Transition */
     overflow: hidden;
+    /* Neue Styles für den App-Store-Look */
+    background: linear-gradient(145deg, #f9f9f9, #e0e0e0); /* Subtiler heller Farbverlauf */
+    border-radius: 22%; /* Übliche App-Icon-Rundung (Squircle-ähnlich) */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05); /* Tiefe und subtiler Rand */
+    border: 1px solid rgba(0,0,0,0.05); /* Sehr subtiler Rand */
 }
 
 .app-icon img {
-    width: 70%;
-    height: 70%;
+    /* Angepasste Regel für bildbasierte Icons */
+    width: 65%; /* Etwas kleiner, um mehr Rand zu lassen */
+    height: 65%; /* Etwas kleiner, um mehr Rand zu lassen */
     object-fit: contain;
     filter: none;
 }
 
 /* Lichtreflexion auf der oberen Hälfte der App-Kachel */
-.app-icon::after {
-    display: none;
-}
-
-.app-icon i {
-    transition: transform 0.2s ease;
-}
+/* Dies war für den alten 3D-Look, wird nicht mehr benötigt */
 
 .app-label, #profileNameDisplay.app-label {
     font-size: 11px;
@@ -1720,9 +1728,10 @@ body.dark-mode #bottomAppDockContent {
     box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
 }
 body.dark-mode .app-icon {
-    background: rgba(255, 255, 255, 0.06);
-    box-shadow: none;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    /* Dark Mode für den app-icon Hintergrund */
+    background: linear-gradient(145deg, #3a3a3a, #2c2c2c); /* Subtiler dunkler Farbverlauf */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.05);
 }
 body.dark-mode .app-label,
 body.dark-mode #profileNameDisplay.app-label {
