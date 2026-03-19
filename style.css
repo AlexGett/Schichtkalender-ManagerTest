@@ -1290,26 +1290,46 @@ body.dark-mode .loading-message {
 }
 
 /* Stile für die Update-Benachrichtigung */
+#update-banner {
+    position: fixed;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #db261f;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    display: none;
+    align-items: center;
+    gap: 20px;
+    z-index: 2000;
+    font-size: 1.1em;
+}
+
 #update-banner button {
-    background-color: transparent;
-    color: #ffffff;
-    border: 2px solid #ffffff; /* Weißer Rand statt Hintergrund */
-    border-radius: 6px;
-    padding: 8px 20px;
-    font-size: 0.95em;
-    font-weight: 600;
+    background-color: white;
+    color: #333;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 #update-banner button:hover {
-    background-color: #ffffff; /* Füllt sich beim Hover weiß */
-    color: #db261f; /* Schrift wird rot */
-    transform: scale(1.05); /* Wird ganz leicht größer */
+    background-color: #f0f0f0;
 }
 
-#update-banner button:active {
-    transform: scale(0.98);
+/* Dark-Mode-Stile für die Benachrichtigung */
+body.dark-mode #update-banner {
+    background-color: #db261f;
+    color: white;
+}
+
+body.dark-mode .greeting-text {
+    color: #aaa;
 }
 
 /* ===== SIGNATURE CANVAS STYLES ===== */
