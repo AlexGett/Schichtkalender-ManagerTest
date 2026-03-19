@@ -1290,46 +1290,35 @@ body.dark-mode .loading-message {
 }
 
 /* Stile für die Update-Benachrichtigung */
-#update-banner {
-    position: fixed;
-    bottom: 70px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #db261f;
-    color: white;
-    padding: 15px 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    display: none;
-    align-items: center;
-    gap: 20px;
-    z-index: 2000;
-    font-size: 1.1em;
-}
-
 #update-banner button {
-    background-color: white;
-    color: #333;
+    background-color: #ffffff;
+    color: #db261f; /* Schriftfarbe passend zum roten Banner */
     border: none;
-    border-radius: 5px;
-    padding: 8px 15px;
-    font-weight: bold;
+    border-radius: 6px; /* Etwas weichere Ecken */
+    padding: 10px 20px; /* Großzügigere Klickfläche */
+    font-size: 0.95em;
+    font-weight: 700;
+    letter-spacing: 0.5px; /* Etwas mehr Zeichenabstand für Lesbarkeit */
     cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Sanfter Schatten hebt den Button ab */
+    transition: all 0.25s ease; /* Weicher Übergang für alle Effekte */
 }
 
 #update-banner button:hover {
-    background-color: #f0f0f0;
+    background-color: #fcfcfc;
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.25); /* Schatten wird beim Hover größer */
+    transform: translateY(-2px); /* Button hebt sich leicht an */
 }
 
-/* Dark-Mode-Stile für die Benachrichtigung */
-body.dark-mode #update-banner {
-    background-color: #db261f;
-    color: white;
+#update-banner button:active {
+    transform: translateY(1px); /* Button wird beim Klicken "hineingedrückt" */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); /* Schatten wird kleiner */
 }
 
-body.dark-mode .greeting-text {
-    color: #aaa;
+/* Wichtig für die Barrierefreiheit (Tastaturnavigation) */
+#update-banner button:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
 }
 
 /* ===== SIGNATURE CANVAS STYLES ===== */
